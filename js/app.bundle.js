@@ -2840,12 +2840,17 @@ function createExportButton(onClick) {
 class PasswordGate {
     static async init() {
         const SESSION_KEY = 'naa_auth_session';
-        // Password provided by user in chat
         const REQUIRED_PASS = 'itm22Fisica';
 
-        // Check if already authenticated
-        if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-            return true;
+        console.log('PasswordGate: Starting initialization');
+
+        try {
+            if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+                console.log('PasswordGate: Session valid');
+                return true;
+            }
+        } catch (e) {
+            console.warn('PasswordGate: SessionStorage inaccessible', e);
         }
 
         return new Promise((resolve) => {

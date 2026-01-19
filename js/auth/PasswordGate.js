@@ -79,7 +79,7 @@ const PasswordGate = {
     /**
      * Create and show login overlay
      */
-    showLoginScreen() {
+    showLoginScreen(onSuccess) {
         const overlay = document.createElement('div');
         overlay.id = 'password-gate';
         overlay.innerHTML = `
@@ -268,6 +268,7 @@ const PasswordGate = {
                     overlay.remove();
                     style.remove();
                 }, 300);
+                if (onSuccess) onSuccess(true);
             } else {
                 errorEl.textContent = 'Invalid access code. Please try again.';
                 passwordInput.classList.add('gate-shake');
@@ -282,13 +283,16 @@ const PasswordGate = {
 
     /**
      * Initialize - check auth and show login if needed
+     * Returns a Promise that resolves to true when authenticated
      */
     init() {
-        if (!this.isAuthenticated()) {
-            this.showLoginScreen();
-            return false;
-        }
-        return true;
+        return new Promise((resolve) => {
+            if (this.isAuthenticated()) {
+                resolve(true);
+            } else {
+                this.showLoginScreen(resolve);
+            }
+        });
     }
 };
 

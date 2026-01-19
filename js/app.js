@@ -21,10 +21,11 @@ class App {
         this.init();
     }
 
-    init() {
+    async init() {
         try {
             // Security Check
-            if (!PasswordGate.init()) return;
+            const isAuthenticated = await PasswordGate.init();
+            if (!isAuthenticated) return;
 
             console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 

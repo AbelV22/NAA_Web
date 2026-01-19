@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 window.NUCLEAR_DATA_OFFLINE = {
     xs: `Symbol,Z,A,Abundance,MT,Reaction,Max_XS,XS_ENDF_VIII_1,XS_JENDL,XS_JEFF,Daughter_Isotope,Decay_Constant_Lambda,Manual Value,Relative change,key,Origen,InsertadoDesdeFuente,Z_daughter,A_daughter,Half_Life_Seconds_Daughter,XS_ENDF,Decay_Co,Manual
 H,1,1,0.99999,102,"n,g",0.333190116,0.333190116,0.333190116,0.332617513,H-2,0,0.332587,-0.001813408,"H|<NA>|102|n,g",,FALSE,1,2,,,,
@@ -3460,11 +3460,7 @@ const PasswordGate = {
     /**
      * Create and show login overlay
      */
-    /**
-     * Create and show login overlay
-     * @param {Function} onLoginSuccess Callback when login is successful
-     */
-    showLoginScreen(onLoginSuccess) {
+    showLoginScreen(onSuccess) {
         const overlay = document.createElement('div');
         overlay.id = 'password-gate';
         overlay.innerHTML = `
@@ -3652,8 +3648,8 @@ const PasswordGate = {
                 setTimeout(() => {
                     overlay.remove();
                     style.remove();
-                    if (onLoginSuccess) onLoginSuccess();
                 }, 300);
+                if (onSuccess) onSuccess(true);
             } else {
                 errorEl.textContent = 'Invalid access code. Please try again.';
                 passwordInput.classList.add('gate-shake');
@@ -3668,17 +3664,15 @@ const PasswordGate = {
 
     /**
      * Initialize - check auth and show login if needed
-     * Returns a Promise that resolves when authenticated
+     * Returns a Promise that resolves to true when authenticated
      */
-    async init() {
-        if (this.isAuthenticated()) {
-            return true;
-        }
-
+    init() {
         return new Promise((resolve) => {
-            this.showLoginScreen(() => {
+            if (this.isAuthenticated()) {
                 resolve(true);
-            });
+            } else {
+                this.showLoginScreen(resolve);
+            }
         });
     }
 };
@@ -3713,8 +3707,8 @@ class App {
     async init() {
         try {
             // Security Check
-            await PasswordGate.init();
-            console.log('Authentication successful. Resuming initialization...');
+            const isAuthenticated = await PasswordGate.init();
+            if (!isAuthenticated) return;
 
             console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 

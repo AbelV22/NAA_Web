@@ -2281,6 +2281,103 @@ class DataLoader {
     }
 }
 
+// --- js/store/DataLoader.js ---
+
+
+class DataLoader {
+    constructor() {
+        this.cache = new Map();
+        // Path relative to index.html (which is in premium_app/)
+        // Data is in premium_app/public/data/
+        this.paths = {
+            xs: './public/data/Database_Fixed_Lambdas2.csv',
+            chain: './public/data/BaseDatos_Cadenas_Completas.csv',
+            limits: './public/data/limits.csv'
+        };
+    }
+
+    async loadAll() {
+        try {
+            const [xsData, chainData, limitsData] = await Promise.all([
+                this.loadCSV(this.paths.xs),
+                this.loadCSV(this.paths.chain),
+                this.loadCSV(this.paths.limits)
+            ]);
+
+            appStore.setState({
+                xsData,
+                chainData,
+                limitsData,
+                dataLoaded: true
+            });
+
+            console.log('Premium Data Loaded Successfully');
+            return true;
+        } catch (error) {
+            console.error('Data Load Failed', error);
+            appStore.setState({ databaseError: error.message });
+            return false;
+        }
+    }
+
+    async loadCSV(url) {
+        // Check for offline data injection
+        let key = null;
+        if (url.includes('Database_Fixed_Lambdas2')) key = 'xs';
+        else if (url.includes('BaseDatos_Cadenas_Completas')) key = 'chain';
+        else if (url.includes('limits')) key = 'limits';
+
+        if (key && window.NUCLEAR_DATA_OFFLINE && window.NUCLEAR_DATA_OFFLINE[key]) {
+            console.log(`Using embedded data for ${key}`);
+            const text = window.NUCLEAR_DATA_OFFLINE[key];
+            const data = this.parseCSV(text);
+            this.cache.set(url, data);
+            return data;
+        }
+
+        if (this.cache.has(url)) return this.cache.get(url);
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch ${url}`);
+        const text = await response.text();
+        const data = this.parseCSV(text);
+
+        this.cache.set(url, data);
+        return data;
+    }
+
+    parseCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(',').map(h => h.trim());
+
+        return lines.slice(1).map(line => {
+            // Handle quoted strings (simple split doesn't work for "a,b")
+            // But our DB has simple structure, simple regex split is safer
+            // Or use a simple CSV parser
+            const values = [];
+            let current = '';
+            let inQuote = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') inQuote = !inQuote;
+                else if (char === ',' && !inQuote) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            values.push(current.trim());
+
+            return headers.reduce((obj, header, idx) => {
+                obj[header] = values[idx] || '';
+                return obj;
+            }, {});
+        });
+    }
+}
+
 // --- js/utils/Charts.js ---
 /**
  * Charts.js - Chart rendering utilities using Chart.js (loaded via CDN)
@@ -2832,6 +2929,80 @@ function createExportButton(onClick) {
     return btn;
 }
 
+// --- js/auth/PasswordGate.js ---
+/**
+ * PasswordGate.js
+ * Simple client-side password protection.
+ */
+class PasswordGate {
+    static async init() {
+        const SESSION_KEY = 'naa_auth_session';
+        // Password provided by user in chat
+        const REQUIRED_PASS = 'itm22Fisica';
+
+        // Check if already authenticated
+        if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+            return true;
+        }
+
+        return new Promise((resolve) => {
+            // Create Modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(10, 10, 25, 0.95); z-index: 99999;
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                backdrop-filter: blur(10px);
+            `;
+
+            modal.innerHTML = `
+                <div class="card" style="padding: 2rem; width: 300px; text-align: center; border: 1px solid var(--primary-color);">
+                    <div style="margin-bottom: 1.5rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <h2 style="margin-top: 0; margin-bottom: 1rem;">Restricted Access</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                        This tool handles sensitive nuclear data. Please authenticate.
+                    </p>
+                    <input type="password" id="gate-pass" placeholder="Enter Password" 
+                        style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; margin-bottom: 1rem;">
+                    <button id="gate-btn" class="btn-primary" style="width: 100%;">Unlock Tool</button>
+                    <p id="gate-error" style="color: #ff6b6b; font-size: 0.8rem; margin-top: 1rem; min-height: 1.2em;"></p>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            const input = modal.querySelector('#gate-pass');
+            const btn = modal.querySelector('#gate-btn');
+            const errorMsg = modal.querySelector('#gate-error');
+
+            const checkPass = () => {
+                if (input.value === REQUIRED_PASS) {
+                    sessionStorage.setItem(SESSION_KEY, 'true');
+                    modal.remove();
+                    resolve(true);
+                } else {
+                    errorMsg.textContent = 'Incorrect password';
+                    input.value = '';
+                    input.focus();
+                }
+            };
+
+            btn.addEventListener('click', checkPass);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkPass();
+            });
+
+            // Focus input
+            setTimeout(() => input.focus(), 100);
+        });
+    }
+}
+
 // --- js/engine/NuclearSolver.js ---
 
 
@@ -3378,314 +3549,6 @@ class NuclearSolver {
     }
 }
 
-// --- js/auth/PasswordGate.js ---
-/**
- * Password Gate for Nuclear Calculator
- * Uses SHA-256 hashing for password obfuscation
- */
-
-const PasswordGate = {
-    // SHA-256 hashes of valid passwords (not the actual passwords!)
-    // Use password_helper.html to generate new hashes
-    validHashes: [
-        '5bc997939c2cd911d2586194ef3c39561cae6b1feaee12c018769373ff5c8ba7', // Primary password
-        'ca42ab62fb0648630652295abc093e9be251f139c0b3d19fa93803bfda697c33', // Alternative 1
-        'c407f90d5044ce805a8efdbd1201c92bbce169b139b42c52665247cf9a01db2f'  // Alternative 2
-    ],
-
-    // Storage key
-    storageKey: 'nuclear_calc_auth',
-
-    // Session duration (7 days in milliseconds)
-    sessionDuration: 7 * 24 * 60 * 60 * 1000,
-
-    /**
-     * Check if user is authenticated
-     */
-    isAuthenticated() {
-        const session = localStorage.getItem(this.storageKey);
-        if (!session) return false;
-
-        try {
-            const data = JSON.parse(session);
-            const now = Date.now();
-            return data.expires > now;
-        } catch {
-            return false;
-        }
-    },
-
-    /**
-     * SHA-256 hash function using Web Crypto API
-     */
-    async sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        return hashHex;
-    },
-
-    /**
-     * Verify password against stored hashes
-     */
-    async verifyPassword(password) {
-        const inputHash = await this.sha256(password);
-        return this.validHashes.includes(inputHash);
-    },
-
-    /**
-     * Authenticate and save session
-     */
-    async authenticate(password) {
-        const isValid = await this.verifyPassword(password);
-        if (isValid) {
-            const session = {
-                authenticated: true,
-                expires: Date.now() + this.sessionDuration
-            };
-            localStorage.setItem(this.storageKey, JSON.stringify(session));
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Logout
-     */
-    logout() {
-        localStorage.removeItem(this.storageKey);
-    },
-
-    /**
-     * Create and show login overlay
-     */
-    showLoginScreen(onSuccess) {
-        const overlay = document.createElement('div');
-        overlay.id = 'password-gate';
-        overlay.innerHTML = `
-            <div class="gate-container">
-                <div class="gate-card">
-                    <div class="gate-logo">
-                        <img src="./public/assets/itm_logo_claim_white_rgb_high-res.png" alt="ITM" onerror="this.style.display='none'">
-                    </div>
-                    <h1 class="gate-title">Thermal NAA Tool</h1>
-                    <p class="gate-subtitle">Powered by ITM Medical Isotopes GmbH</p>
-                    
-                    <form id="gate-form" class="gate-form">
-                        <div class="gate-input-group">
-                            <input type="password" id="gate-password" placeholder="Enter access code" autocomplete="current-password" required>
-                        </div>
-                        <button type="submit" class="gate-button">
-                            <span>Access Calculator</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </button>
-                        <p id="gate-error" class="gate-error"></p>
-                    </form>
-                    
-                    <p class="gate-footer">ITM Medical Isotopes • Internal Use Only</p>
-                </div>
-            </div>
-        `;
-
-        // Add styles
-        const style = document.createElement('style');
-        style.textContent = `
-            #password-gate {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a1a2a 100%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 99999;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            }
-            
-            .gate-container {
-                width: 100%;
-                max-width: 420px;
-                padding: 24px;
-            }
-            
-            .gate-card {
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 24px;
-                padding: 48px 40px;
-                backdrop-filter: blur(20px);
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            }
-            
-            .gate-logo {
-                text-align: center;
-                margin-bottom: 32px;
-            }
-            
-            .gate-logo img {
-                height: 50px;
-                opacity: 0.9;
-            }
-            
-            .gate-title {
-                color: white;
-                font-size: 28px;
-                font-weight: 700;
-                text-align: center;
-                margin: 0 0 8px 0;
-                letter-spacing: -0.5px;
-            }
-            
-            .gate-subtitle {
-                color: rgba(255, 255, 255, 0.5);
-                font-size: 14px;
-                text-align: center;
-                margin: 0 0 40px 0;
-            }
-            
-            .gate-form {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .gate-input-group input {
-                width: 100%;
-                padding: 16px 20px;
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                border-radius: 12px;
-                color: white;
-                font-size: 16px;
-                transition: all 0.2s ease;
-                box-sizing: border-box;
-            }
-            
-            .gate-input-group input:focus {
-                outline: none;
-                border-color: #00d4ff;
-                background: rgba(0, 212, 255, 0.05);
-                box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-            }
-            
-            .gate-input-group input::placeholder {
-                color: rgba(255, 255, 255, 0.4);
-            }
-            
-            .gate-button {
-                width: 100%;
-                padding: 16px 24px;
-                background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-                border: none;
-                border-radius: 12px;
-                color: white;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                transition: all 0.2s ease;
-            }
-            
-            .gate-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 30px -10px rgba(0, 212, 255, 0.5);
-            }
-            
-            .gate-button:active {
-                transform: translateY(0);
-            }
-            
-            .gate-error {
-                color: #ff6b6b;
-                font-size: 14px;
-                text-align: center;
-                margin: 8px 0 0 0;
-                min-height: 20px;
-            }
-            
-            .gate-footer {
-                color: rgba(255, 255, 255, 0.3);
-                font-size: 12px;
-                text-align: center;
-                margin: 32px 0 0 0;
-            }
-            
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-8px); }
-                75% { transform: translateX(8px); }
-            }
-            
-            .gate-shake {
-                animation: shake 0.4s ease-in-out;
-            }
-        `;
-
-        document.head.appendChild(style);
-        document.body.appendChild(overlay);
-
-        // Handle form submission
-        const form = document.getElementById('gate-form');
-        const passwordInput = document.getElementById('gate-password');
-        const errorEl = document.getElementById('gate-error');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const password = passwordInput.value;
-
-            const isValid = await this.authenticate(password);
-            if (isValid) {
-                overlay.style.opacity = '0';
-                overlay.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => {
-                    overlay.remove();
-                    style.remove();
-                }, 300);
-                if (onSuccess) onSuccess(true);
-            } else {
-                errorEl.textContent = 'Invalid access code. Please try again.';
-                passwordInput.classList.add('gate-shake');
-                setTimeout(() => passwordInput.classList.remove('gate-shake'), 400);
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
-        });
-
-        passwordInput.focus();
-    },
-
-    /**
-     * Initialize - check auth and show login if needed
-     * Returns a Promise that resolves to true when authenticated
-     */
-    init() {
-        console.log('PasswordGate: init called');
-        return new Promise((resolve) => {
-            if (this.isAuthenticated()) {
-                console.log('PasswordGate: Already authenticated');
-                resolve(true);
-            } else {
-                console.log('PasswordGate: Showing login screen');
-                this.showLoginScreen(resolve);
-            }
-        });
-    }
-};
-
-// Explicitly attach to window to ensure availability in bundle
-window.PasswordGate = PasswordGate;
-
-// Export for use in app.js
-
-
 // --- js/app.js ---
 /**
  * app.js
@@ -3702,149 +3565,136 @@ window.PasswordGate = PasswordGate;
 
 
 
-
-class App {
-    constructor() {
-        this.dataLoader = new DataLoader();
-        this.solver = null;
-        this.init();
-    }
-
     async init() {
-        try {
-            // Security Check
-            console.log('App: Initializing PasswordGate...');
-            const isAuthenticated = await PasswordGate.init();
-            if (!isAuthenticated) return;
+    try {
+        console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 
-            console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
+        // Initialize UI
+        this.setupNavigation();
+        this.setupAutocomplete();
+        this.renderSingleIsotopeForm();
+        this.renderImpurityForm();
+        this.renderWasteForm();
+        this.renderLimitForm();
+        this.setupEventListeners();
 
-            // Initialize UI
-            this.setupNavigation();
-            this.setupAutocomplete();
-            this.renderSingleIsotopeForm();
-            this.renderImpurityForm();
-            this.renderWasteForm();
-            this.renderLimitForm();
-            this.setupEventListeners();
-
-            this.dataLoader.loadAll()
-                .then(() => {
-                    const state = appStore.getState();
-                    if (state.dataLoaded) {
-                        this.solver = new NuclearSolver(state.xsData, state.chainData, state.limitsData);
-                        console.log('Math Engine Initialized');
-                    }
-                    console.log('App ready');
-                    // Hide any initial loading spinner if applicable
-                })
-                .catch(err => {
-                    console.error('Data loading error:', err);
-                    this.showError('Database Error', `Failed to load nuclear data CSV files. Check if they exist in public/data/. Details: ${err.message}`);
-                });
-        } catch (error) {
-            console.error('Initialization Error:', error);
-            this.showError('Application Error', `Failed to initialize the tool. Details: ${error.message}`);
-        }
+        this.dataLoader.loadAll()
+            .then(() => {
+                const state = appStore.getState();
+                if (state.dataLoaded) {
+                    this.solver = new NuclearSolver(state.xsData, state.chainData, state.limitsData);
+                    console.log('Math Engine Initialized');
+                }
+                console.log('App ready');
+                // Hide any initial loading spinner if applicable
+            })
+            .catch(err => {
+                console.error('Data loading error:', err);
+                this.showError('Database Error', `Failed to load nuclear data CSV files. Check if they exist in public/data/. Details: ${err.message}`);
+            });
+    } catch (error) {
+        console.error('Initialization Error:', error);
+        this.showError('Application Error', `Failed to initialize the tool. Details: ${error.message}`);
     }
+}
 
-    showError(title, msg) {
-        const modal = document.createElement('div');
-        modal.className = 'card';
-        modal.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:100000; padding:2rem; background:#1a1a3a; border:2px solid #ff6b6b; color:white; max-width:500px; box-shadow:0 0 50px rgba(0,0,0,0.8);';
-        modal.innerHTML = `
+showError(title, msg) {
+    const modal = document.createElement('div');
+    modal.className = 'card';
+    modal.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:100000; padding:2rem; background:#1a1a3a; border:2px solid #ff6b6b; color:white; max-width:500px; box-shadow:0 0 50px rgba(0,0,0,0.8);';
+    modal.innerHTML = `
             <h2 style="color:#ff6b6b; margin-top:0;">⚠️ ${title}</h2>
             <p>${msg}</p>
             <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem; width:100%;">Retry / Refresh</button>
         `;
-        document.body.appendChild(modal);
-    }
+    document.body.appendChild(modal);
+}
 
-    setupNavigation() {
-        const tabs = document.querySelectorAll('.nav-tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const target = tab.dataset.tab;
-                appStore.setState({ activeTab: target });
-                this.updateActiveTabs(target);
-            });
+setupNavigation() {
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            appStore.setState({ activeTab: target });
+            this.updateActiveTabs(target);
         });
-        appStore.subscribe((state) => {
-            this.updateActiveTabs(state.activeTab);
-        });
-    }
+    });
+    appStore.subscribe((state) => {
+        this.updateActiveTabs(state.activeTab);
+    });
+}
 
-    updateActiveTabs(activeId) {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeId));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${activeId}`));
-    }
+updateActiveTabs(activeId) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeId));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${activeId}`));
+}
 
-    setupAutocomplete() {
-        const list = document.createElement('datalist');
-        list.id = 'elements-list';
-        PERIODIC_TABLE.forEach(elem => {
-            const opt = document.createElement('option');
-            opt.value = elem;
-            list.appendChild(opt);
-        });
-        document.body.appendChild(list);
-    }
+setupAutocomplete() {
+    const list = document.createElement('datalist');
+    list.id = 'elements-list';
+    PERIODIC_TABLE.forEach(elem => {
+        const opt = document.createElement('option');
+        opt.value = elem;
+        list.appendChild(opt);
+    });
+    document.body.appendChild(list);
+}
 
-    setupEventListeners() {
-        bus.on(EVENTS.CALCULATION_START, () => this.handleCalculation());
+setupEventListeners() {
+    bus.on(EVENTS.CALCULATION_START, () => this.handleCalculation());
 
-        // Delegate Event Listeners for dynamic elements
-        document.body.addEventListener('click', (e) => {
-            const id = e.target.id;
-            if (id === 'btn-calculate') this.handleCalculation();
+    // Delegate Event Listeners for dynamic elements
+    document.body.addEventListener('click', (e) => {
+        const id = e.target.id;
+        if (id === 'btn-calculate') this.handleCalculation();
 
-            // Impurity Strings
-            if (id === 'btn-add-imp') this.addImpurityItem();
-            if (id === 'btn-calc-imp') this.handleImpurityCalculation();
+        // Impurity Strings
+        if (id === 'btn-add-imp') this.addImpurityItem();
+        if (id === 'btn-calc-imp') this.handleImpurityCalculation();
 
-            // Waste Strings
-            if (id === 'btn-add-waste-imp') this.addWasteItem();
-            if (id === 'btn-calc-waste') this.handleWasteCalculation();
+        // Waste Strings
+        if (id === 'btn-add-waste-imp') this.addWasteItem();
+        if (id === 'btn-calc-waste') this.handleWasteCalculation();
 
-            // Limit Strings
-            if (id === 'btn-add-lim') this.addLimitItem();
-            if (id === 'btn-calc-lim') this.handleLimitCalculation();
+        // Limit Strings
+        if (id === 'btn-add-lim') this.addLimitItem();
+        if (id === 'btn-calc-lim') this.handleLimitCalculation();
 
-            // Help Toggle logic
-            if (e.target.classList.contains('help-btn') || e.target.closest('.help-btn')) {
-                const btn = e.target.classList.contains('help-btn') ? e.target : e.target.closest('.help-btn');
-                const targetId = btn.dataset.help;
-                const panel = document.getElementById(targetId);
-                if (panel) {
-                    panel.classList.toggle('active');
-                }
+        // Help Toggle logic
+        if (e.target.classList.contains('help-btn') || e.target.closest('.help-btn')) {
+            const btn = e.target.classList.contains('help-btn') ? e.target : e.target.closest('.help-btn');
+            const targetId = btn.dataset.help;
+            const panel = document.getElementById(targetId);
+            if (panel) {
+                panel.classList.toggle('active');
             }
+        }
 
-            // Manual triggers
-            if (id === 'btn-open-manual') document.getElementById('manual-modal').classList.add('active');
-            if (id === 'btn-close-manual') document.getElementById('manual-modal').classList.remove('active');
+        // Manual triggers
+        if (id === 'btn-open-manual') document.getElementById('manual-modal').classList.add('active');
+        if (id === 'btn-close-manual') document.getElementById('manual-modal').classList.remove('active');
 
-            // Remove buttons
-            if (e.target.classList.contains('btn-remove-item')) {
-                e.target.parentElement.remove();
-            }
-        });
-    }
+        // Remove buttons
+        if (e.target.classList.contains('btn-remove-item')) {
+            e.target.parentElement.remove();
+        }
+    });
+}
 
-    renderSingleIsotopeForm() {
-        const container = document.getElementById('tab-single-isotope');
-        if (!container) return;
+renderSingleIsotopeForm() {
+    const container = document.getElementById('tab-single-isotope');
+    if (!container) return;
 
-        // Define SVG icons inline for performance
-        const icons = {
-            atom: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/></svg>',
-            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-        };
+    // Define SVG icons inline for performance
+    const icons = {
+        atom: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/></svg>',
+        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+    };
 
-        container.innerHTML = `
+    container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Single Isotope Activation</h2>
@@ -3896,21 +3746,21 @@ class App {
                 <div id="results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>
         `;
-    }
+}
 
-    renderImpurityForm() {
-        const container = document.getElementById('tab-impurity');
-        if (!container) return;
+renderImpurityForm() {
+    const container = document.getElementById('tab-impurity');
+    if (!container) return;
 
-        const icons = {
-            element: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="currentColor">Fe</text></svg>',
-            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-        };
+    const icons = {
+        element: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="currentColor">Fe</text></svg>',
+        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+    };
 
-        container.innerHTML = `
+    container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Impurity Activation</h2>
@@ -3955,21 +3805,21 @@ class App {
                 </div>
                 <div id="imp-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
-    }
+}
 
-    renderWasteForm() {
-        const container = document.getElementById('tab-waste');
-        if (!container) return;
+renderWasteForm() {
+    const container = document.getElementById('tab-waste');
+    if (!container) return;
 
-        const icons = {
-            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-            waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
-            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-        };
+    const icons = {
+        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+        waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
+        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+    };
 
-        container.innerHTML = `
+    container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Waste Compliance</h2>
@@ -4012,21 +3862,21 @@ class App {
                 <button id="btn-calc-waste" class="btn-primary">Analyze Batch</button>
                 <div id="waste-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
-    }
+}
 
-    renderLimitForm() {
-        const container = document.getElementById('tab-limits');
-        if (!container) return;
+renderLimitForm() {
+    const container = document.getElementById('tab-limits');
+    if (!container) return;
 
-        const icons = {
-            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-            waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
-            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-        };
+    const icons = {
+        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+        waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
+        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+    };
 
-        container.innerHTML = `
+    container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Limit ppm Calculator</h2>
@@ -4090,154 +3940,154 @@ class App {
                 <button id="btn-calc-lim" class="btn-primary">Calculate Max ppm</button>
                 <div id="lim-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
+}
+
+handleCalculation() {
+    if (!this.solver) {
+        this.showToast('Engine not ready yet', 'error');
+        return;
     }
 
-    handleCalculation() {
-        if (!this.solver) {
-            this.showToast('Engine not ready yet', 'error');
-            return;
-        }
+    const iso = document.getElementById('input-iso').value;
+    const mass = parseFloat(document.getElementById('input-mass').value);
+    const fluxStr = document.getElementById('input-flux').value;
+    const time = parseFloat(document.getElementById('input-time').value);
+    const cool = parseFloat(document.getElementById('input-cool').value);
 
-        const iso = document.getElementById('input-iso').value;
-        const mass = parseFloat(document.getElementById('input-mass').value);
-        const fluxStr = document.getElementById('input-flux').value;
-        const time = parseFloat(document.getElementById('input-time').value);
-        const cool = parseFloat(document.getElementById('input-cool').value);
+    const flux = parseFloat(fluxStr);
+    const tIrrS = time * SECONDS_PER_DAY;
+    const tCoolS = cool * SECONDS_PER_DAY;
 
-        const flux = parseFloat(fluxStr);
-        const tIrrS = time * SECONDS_PER_DAY;
-        const tCoolS = cool * SECONDS_PER_DAY;
+    this.showToast('Computing...', 'info');
 
-        this.showToast('Computing...', 'info');
-
-        try {
-            const results = this.solver.solve(iso, mass, flux, tIrrS, tCoolS);
-            this.renderResults(results, 'results-area');
-            this.showToast('Calculation Complete', 'success');
-        } catch (e) {
-            console.error(e);
-            this.showToast('Calculation Error', 'error');
-        }
+    try {
+        const results = this.solver.solve(iso, mass, flux, tIrrS, tCoolS);
+        this.renderResults(results, 'results-area');
+        this.showToast('Calculation Complete', 'success');
+    } catch (e) {
+        console.error(e);
+        this.showToast('Calculation Error', 'error');
     }
+}
 
-    // --- IMPURITY CALCULATOR ---
-    addImpurityItem() {
-        const symStart = document.getElementById('imp-sym');
-        const ppmStart = document.getElementById('imp-ppm');
-        if (!symStart.value || !ppmStart.value) return;
+// --- IMPURITY CALCULATOR ---
+addImpurityItem() {
+    const symStart = document.getElementById('imp-sym');
+    const ppmStart = document.getElementById('imp-ppm');
+    if (!symStart.value || !ppmStart.value) return;
 
-        const list = document.getElementById('impurity-list');
-        const item = document.createElement('div');
-        item.className = 'impurity-tag';
-        item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;';
-        item.innerHTML = `
+    const list = document.getElementById('impurity-list');
+    const item = document.createElement('div');
+    item.className = 'impurity-tag';
+    item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;';
+    item.innerHTML = `
             <span class="imp-data" data-sym="${symStart.value}" data-ppm="${ppmStart.value}">${symStart.value}: ${ppmStart.value} ppm</span>
             <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer;">&times;</button>
         `;
-        list.appendChild(item);
-        symStart.value = '';
-        ppmStart.value = '';
-    }
+    list.appendChild(item);
+    symStart.value = '';
+    ppmStart.value = '';
+}
 
-    handleImpurityCalculation() {
-        if (!this.solver) return this.showToast('Engine Loading...', 'error');
+handleImpurityCalculation() {
+    if (!this.solver) return this.showToast('Engine Loading...', 'error');
 
-        const mass = parseFloat(document.getElementById('imp-mass').value) || 0;
-        const flux = parseFloat(document.getElementById('imp-flux').value) || 0;
-        const time = parseFloat(document.getElementById('imp-time').value) || 0;
-        const cool = parseFloat(document.getElementById('imp-cool').value) || 0;
+    const mass = parseFloat(document.getElementById('imp-mass').value) || 0;
+    const flux = parseFloat(document.getElementById('imp-flux').value) || 0;
+    const time = parseFloat(document.getElementById('imp-time').value) || 0;
+    const cool = parseFloat(document.getElementById('imp-cool').value) || 0;
 
-        const tIrrS = time * SECONDS_PER_DAY;
-        const tCoolS = cool * SECONDS_PER_DAY;
+    const tIrrS = time * SECONDS_PER_DAY;
+    const tCoolS = cool * SECONDS_PER_DAY;
 
-        const items = document.querySelectorAll('#impurity-list .imp-data');
-        if (items.length === 0) return this.showToast('Add impurities first', 'warning');
+    const items = document.querySelectorAll('#impurity-list .imp-data');
+    if (items.length === 0) return this.showToast('Add impurities first', 'warning');
 
-        this.showToast('Calculating...', 'info');
+    this.showToast('Calculating...', 'info');
 
-        try {
-            let combinedResults = [];
-            items.forEach(node => {
-                const sym = node.dataset.sym;
-                const ppm = parseFloat(node.dataset.ppm);
-                const elemMass = (ppm / 1e6) * mass;
-
-                const res = this.solver.solveElement(sym, elemMass, flux, tIrrS, tCoolS);
-                combinedResults.push(...res);
-            });
-
-            // Merge
-            const finalMap = new Map();
-            combinedResults.forEach(r => {
-                if (!finalMap.has(r.Isotope)) {
-                    finalMap.set(r.Isotope, { ...r, Activity: 0, Atoms: 0 });
-                }
-                const ex = finalMap.get(r.Isotope);
-                ex.Activity += r.Activity;
-                ex.Atoms += r.Atoms;
-            });
-
-            const results = Array.from(finalMap.values()).sort((a, b) => b.Activity - a.Activity);
-            this.renderResults(results, 'imp-results-area');
-            this.showToast('Impurity Analysis Complete', 'success');
-
-        } catch (e) {
-            console.error(e);
-            this.showToast('Analysis Error', 'error');
-        }
-    }
-
-    // --- WASTE CALCULATOR ---
-    addWasteItem() {
-        const sym = document.getElementById('waste-imp-sym').value;
-        const ppm = document.getElementById('waste-imp-ppm').value;
-        if (!sym || !ppm) return;
-        const list = document.getElementById('waste-imp-list');
-        const item = document.createElement('div');
-        item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; margin-right: 4px; margin-bottom: 4px;';
-        item.innerHTML = `<span class="waste-data" data-sym="${sym}" data-ppm="${ppm}">${sym}: ${ppm} ppm</span> <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer;">x</button>`;
-        list.appendChild(item);
-        document.getElementById('waste-imp-sym').value = '';
-        document.getElementById('waste-imp-ppm').value = '';
-    }
-
-    handleWasteCalculation() {
-        if (!this.solver) return;
-        const mass = parseFloat(document.getElementById('waste-mass').value) || 0;
-        const totalWaste = parseFloat(document.getElementById('waste-total').value) || 0;
-        const flux = parseFloat(document.getElementById('waste-flux').value) || 0;
-        const time = parseFloat(document.getElementById('waste-time').value) || 0;
-        const cool = parseFloat(document.getElementById('waste-cool').value) || 0;
-
-        const tIrrS = time * SECONDS_PER_DAY;
-        const tCoolS = cool * SECONDS_PER_DAY;
-
-        // Get Impurities
-        const impurities = {};
-        document.querySelectorAll('#waste-imp-list .waste-data').forEach(node => {
+    try {
+        let combinedResults = [];
+        items.forEach(node => {
             const sym = node.dataset.sym;
             const ppm = parseFloat(node.dataset.ppm);
-            impurities[sym] = ppm;
+            const elemMass = (ppm / 1e6) * mass;
+
+            const res = this.solver.solveElement(sym, elemMass, flux, tIrrS, tCoolS);
+            combinedResults.push(...res);
         });
 
-        if (Object.keys(impurities).length === 0) return this.showToast('Add impurities first', 'warning');
+        // Merge
+        const finalMap = new Map();
+        combinedResults.forEach(r => {
+            if (!finalMap.has(r.Isotope)) {
+                finalMap.set(r.Isotope, { ...r, Activity: 0, Atoms: 0 });
+            }
+            const ex = finalMap.get(r.Isotope);
+            ex.Activity += r.Activity;
+            ex.Atoms += r.Atoms;
+        });
 
-        this.showToast('Analyzing Batch...', 'info');
+        const results = Array.from(finalMap.values()).sort((a, b) => b.Activity - a.Activity);
+        this.renderResults(results, 'imp-results-area');
+        this.showToast('Impurity Analysis Complete', 'success');
 
-        try {
-            // Call Engine
-            // Assuming "H" as dummy main element or null, using 'exemption' for now based on logic2.py logic for incineration/dumping?
-            // "Limit_Incineration_100t_Bq_g" was hinted in logic2.py, but usually we use 'clearance' or 'exemption'.
-            // Let's default to 'exemption' as a safer "waste" limit, but ideally UI should allow selection.
-            // For now, hardcode 'exemption' to match typical waste compliance checks.
-            const limitType = 'exemption';
+    } catch (e) {
+        console.error(e);
+        this.showToast('Analysis Error', 'error');
+    }
+}
 
-            const results = this.solver.calculateWasteCompliance(
-                impurities, null, mass, flux, tIrrS, tCoolS, totalWaste, limitType
-            );
+// --- WASTE CALCULATOR ---
+addWasteItem() {
+    const sym = document.getElementById('waste-imp-sym').value;
+    const ppm = document.getElementById('waste-imp-ppm').value;
+    if (!sym || !ppm) return;
+    const list = document.getElementById('waste-imp-list');
+    const item = document.createElement('div');
+    item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; margin-right: 4px; margin-bottom: 4px;';
+    item.innerHTML = `<span class="waste-data" data-sym="${sym}" data-ppm="${ppm}">${sym}: ${ppm} ppm</span> <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer;">x</button>`;
+    list.appendChild(item);
+    document.getElementById('waste-imp-sym').value = '';
+    document.getElementById('waste-imp-ppm').value = '';
+}
 
-            // Render Results
-            let html = `
+handleWasteCalculation() {
+    if (!this.solver) return;
+    const mass = parseFloat(document.getElementById('waste-mass').value) || 0;
+    const totalWaste = parseFloat(document.getElementById('waste-total').value) || 0;
+    const flux = parseFloat(document.getElementById('waste-flux').value) || 0;
+    const time = parseFloat(document.getElementById('waste-time').value) || 0;
+    const cool = parseFloat(document.getElementById('waste-cool').value) || 0;
+
+    const tIrrS = time * SECONDS_PER_DAY;
+    const tCoolS = cool * SECONDS_PER_DAY;
+
+    // Get Impurities
+    const impurities = {};
+    document.querySelectorAll('#waste-imp-list .waste-data').forEach(node => {
+        const sym = node.dataset.sym;
+        const ppm = parseFloat(node.dataset.ppm);
+        impurities[sym] = ppm;
+    });
+
+    if (Object.keys(impurities).length === 0) return this.showToast('Add impurities first', 'warning');
+
+    this.showToast('Analyzing Batch...', 'info');
+
+    try {
+        // Call Engine
+        // Assuming "H" as dummy main element or null, using 'exemption' for now based on logic2.py logic for incineration/dumping?
+        // "Limit_Incineration_100t_Bq_g" was hinted in logic2.py, but usually we use 'clearance' or 'exemption'.
+        // Let's default to 'exemption' as a safer "waste" limit, but ideally UI should allow selection.
+        // For now, hardcode 'exemption' to match typical waste compliance checks.
+        const limitType = 'exemption';
+
+        const results = this.solver.calculateWasteCompliance(
+            impurities, null, mass, flux, tIrrS, tCoolS, totalWaste, limitType
+        );
+
+        // Render Results
+        let html = `
                 <div style="background: ${results.summary.isCompliant ? 'rgba(0,255,150,0.1)' : 'rgba(255,100,100,0.1)'}; 
                             padding: 1.5rem; border-radius: 12px; border: 1px solid ${results.summary.isCompliant ? 'var(--accent-green)' : 'var(--accent-red)'}; 
                             margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
@@ -4267,8 +4117,8 @@ class App {
                     </thead>
                     <tbody>`;
 
-            results.results.forEach(r => {
-                html += `
+        results.results.forEach(r => {
+            html += `
                     <tr>
                         <td>${r.Isotope}</td>
                         <td style="font-family: var(--font-mono);">${r.ActivityTotal.toExponential(2)}</td>
@@ -4276,9 +4126,9 @@ class App {
                         <td style="font-family: var(--font-mono);">${r.Limit.toExponential(2)}</td>
                         <td style="font-weight: bold; color: ${r.Fraction > 1 ? 'var(--accent-red)' : 'var(--text-primary)'};">${r.Fraction.toFixed(4)}</td>
                     </tr>`;
-            });
+        });
 
-            html += `</tbody></table>
+        html += `</tbody></table>
             
             <!-- Charts Section -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
@@ -4290,52 +4140,52 @@ class App {
                 </div>
             </div>`;
 
-            document.getElementById('waste-results-area').innerHTML = html;
+        document.getElementById('waste-results-area').innerHTML = html;
 
-            // Render Charts (after DOM update)
-            setTimeout(() => {
-                // Prepare data for charts
-                const chartData = results.results.map(r => ({
-                    Isotope: r.Isotope,
-                    isotope: r.Isotope,
-                    Activity: r.ActivityTotal,
-                    fraction: r.Fraction
-                }));
+        // Render Charts (after DOM update)
+        setTimeout(() => {
+            // Prepare data for charts
+            const chartData = results.results.map(r => ({
+                Isotope: r.Isotope,
+                isotope: r.Isotope,
+                Activity: r.ActivityTotal,
+                fraction: r.Fraction
+            }));
 
-                renderActivityPieChart('waste-pie-chart', chartData);
-                renderComplianceBarChart('waste-bar-chart', chartData.map(d => ({
-                    isotope: d.Isotope,
-                    fraction: d.fraction
-                })));
-            }, 50);
+            renderActivityPieChart('waste-pie-chart', chartData);
+            renderComplianceBarChart('waste-bar-chart', chartData.map(d => ({
+                isotope: d.Isotope,
+                fraction: d.fraction
+            })));
+        }, 50);
 
-            this.showToast('Analysis Complete', 'success');
+        this.showToast('Analysis Complete', 'success');
 
-        } catch (e) {
-            console.error(e);
-            this.showToast('Compliance Error', 'error');
-        }
+    } catch (e) {
+        console.error(e);
+        this.showToast('Compliance Error', 'error');
     }
+}
 
-    // --- LIMIT CALCULATOR ---
-    addLimitItem() {
-        const symStart = document.getElementById('lim-sym');
-        const fracStart = document.getElementById('lim-frac');
-        const wasteStart = document.getElementById('lim-waste');
+// --- LIMIT CALCULATOR ---
+addLimitItem() {
+    const symStart = document.getElementById('lim-sym');
+    const fracStart = document.getElementById('lim-frac');
+    const wasteStart = document.getElementById('lim-waste');
 
-        const sym = symStart.value.trim();
-        if (!sym) return;
+    const sym = symStart.value.trim();
+    if (!sym) return;
 
-        // Defaults
-        const frac = parseFloat(fracStart.value) || 100;
-        const waste = parseFloat(wasteStart.value) || 100;
+    // Defaults
+    const frac = parseFloat(fracStart.value) || 100;
+    const waste = parseFloat(wasteStart.value) || 100;
 
-        const list = document.getElementById('lim-list');
-        const item = document.createElement('div');
-        item.className = 'lim-row';
-        item.style.cssText = 'background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;';
+    const list = document.getElementById('lim-list');
+    const item = document.createElement('div');
+    item.className = 'lim-row';
+    item.style.cssText = 'background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;';
 
-        item.innerHTML = `
+    item.innerHTML = `
             <div class="lim-data" data-sym="${sym}" data-frac="${frac}" data-waste="${waste}" style="display: flex; gap: 1rem; align-items: center;">
                 <span style="font-weight: bold; width: 40px;">${sym}</span>
                 <span style="color: #aaa; font-size: 0.9em;">Frac: <span style="color: white">${frac}%</span></span>
@@ -4343,52 +4193,52 @@ class App {
             </div>
             <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer; font-size: 1.2em;">&times;</button>
         `;
-        list.appendChild(item);
+    list.appendChild(item);
 
-        // Reset inputs
-        symStart.value = '';
-        // fracStart.value = '100'; // Keep defaults for rapid entry
-        // wasteStart.value = '100';
-        symStart.focus();
-    }
+    // Reset inputs
+    symStart.value = '';
+    // fracStart.value = '100'; // Keep defaults for rapid entry
+    // wasteStart.value = '100';
+    symStart.focus();
+}
 
-    handleLimitCalculation() {
-        if (!this.solver) return;
-        const mass = parseFloat(document.getElementById('lim-mass').value) || 0;
-        const wMass = parseFloat(document.getElementById('lim-wmass').value) || 0;
-        const flux = parseFloat(document.getElementById('lim-flux').value) || 0;
-        const time = parseFloat(document.getElementById('lim-time').value) || 0;
-        const cool = parseFloat(document.getElementById('lim-cool').value) || 0;
-        const limitType = document.getElementById('lim-type').value;
+handleLimitCalculation() {
+    if (!this.solver) return;
+    const mass = parseFloat(document.getElementById('lim-mass').value) || 0;
+    const wMass = parseFloat(document.getElementById('lim-wmass').value) || 0;
+    const flux = parseFloat(document.getElementById('lim-flux').value) || 0;
+    const time = parseFloat(document.getElementById('lim-time').value) || 0;
+    const cool = parseFloat(document.getElementById('lim-cool').value) || 0;
+    const limitType = document.getElementById('lim-type').value;
 
-        const tIrrS = time * SECONDS_PER_DAY;
-        const tCoolS = cool * SECONDS_PER_DAY;
+    const tIrrS = time * SECONDS_PER_DAY;
+    const tCoolS = cool * SECONDS_PER_DAY;
 
-        const elements = [];
-        const fractions = {};
-        const wasteFractions = {};
+    const elements = [];
+    const fractions = {};
+    const wasteFractions = {};
 
-        document.querySelectorAll('#lim-list .lim-data').forEach(node => {
-            const s = node.dataset.sym;
-            const f = parseFloat(node.dataset.frac) || 100;
-            const w = parseFloat(node.dataset.waste) || 100;
-            elements.push(s);
-            fractions[s] = f / 100.0; // Convert to decimal
-            wasteFractions[s] = w / 100.0; // Convert to decimal
-        });
+    document.querySelectorAll('#lim-list .lim-data').forEach(node => {
+        const s = node.dataset.sym;
+        const f = parseFloat(node.dataset.frac) || 100;
+        const w = parseFloat(node.dataset.waste) || 100;
+        elements.push(s);
+        fractions[s] = f / 100.0; // Convert to decimal
+        wasteFractions[s] = w / 100.0; // Convert to decimal
+    });
 
-        if (elements.length === 0) return this.showToast('Add target elements first', 'warning');
+    if (elements.length === 0) return this.showToast('Add target elements first', 'warning');
 
-        this.showToast(`Calculating Limits (${limitType})...`, 'info');
+    this.showToast(`Calculating Limits (${limitType})...`, 'info');
 
-        try {
-            const results = this.solver.calculateMaxPPM(
-                elements, flux, tIrrS, tCoolS, wMass, mass, limitType, fractions, wasteFractions
-            );
+    try {
+        const results = this.solver.calculateMaxPPM(
+            elements, flux, tIrrS, tCoolS, wMass, mass, limitType, fractions, wasteFractions
+        );
 
-            if (!results || results.length === 0) return this.showToast('No active isotopes found', 'warning');
+        if (!results || results.length === 0) return this.showToast('No active isotopes found', 'warning');
 
-            let html = `
+        let html = `
                 <div style="overflow-x: auto;">
                 <table class="data-table" style="width:100%; font-size: 0.9em;">
                     <thead>
@@ -4407,11 +4257,11 @@ class App {
                     </thead>
                     <tbody>`;
 
-            results.forEach(r => {
-                const isoPpm = r.IsoMaxPPM > 9.99e9 ? '> 1e10' : r.IsoMaxPPM.toExponential(2);
-                const elemPpm = r.ElemMaxPPM === Infinity ? 'Infinite' : (r.ElemMaxPPM > 9.99e9 ? '> 1e10' : r.ElemMaxPPM.toExponential(2));
+        results.forEach(r => {
+            const isoPpm = r.IsoMaxPPM > 9.99e9 ? '> 1e10' : r.IsoMaxPPM.toExponential(2);
+            const elemPpm = r.ElemMaxPPM === Infinity ? 'Infinite' : (r.ElemMaxPPM > 9.99e9 ? '> 1e10' : r.ElemMaxPPM.toExponential(2));
 
-                html += `
+            html += `
                     <tr>
                         <td style="font-weight: bold; color: var(--accent-cyan);">${r.Element}</td>
                         <td>${r.Parent}</td>
@@ -4424,33 +4274,33 @@ class App {
                         <td>${r.WastePct}</td>
                         <td>${r.FracPct}</td>
                     </tr>`;
-            });
+        });
 
-            html += `</tbody></table></div>`;
-            document.getElementById('lim-results-area').innerHTML = html;
-            this.showToast('Limits Calculated', 'success');
+        html += `</tbody></table></div>`;
+        document.getElementById('lim-results-area').innerHTML = html;
+        this.showToast('Limits Calculated', 'success');
 
-        } catch (e) {
-            console.error(e);
-            this.showToast('Limit Calc Error', 'error');
-        }
+    } catch (e) {
+        console.error(e);
+        this.showToast('Limit Calc Error', 'error');
     }
+}
 
-    renderResults(results, targetId = 'results-area') {
-        const area = document.getElementById(targetId);
-        if (!area) return;
+renderResults(results, targetId = 'results-area') {
+    const area = document.getElementById(targetId);
+    if (!area) return;
 
-        const total = results.reduce((acc, r) => acc + r.Activity, 0);
-        const topIso = results.length > 0 ? results[0] : null;
-        const topPct = topIso ? ((topIso.Activity / total) * 100).toFixed(1) : 0;
+    const total = results.reduce((acc, r) => acc + r.Activity, 0);
+    const topIso = results.length > 0 ? results[0] : null;
+    const topPct = topIso ? ((topIso.Activity / total) * 100).toFixed(1) : 0;
 
-        // Unique canvas ID based on target
-        const pieChartId = `${targetId}-pie-chart`;
+    // Unique canvas ID based on target
+    const pieChartId = `${targetId}-pie-chart`;
 
-        // Store results for PDF export
-        this.lastResults = { title: 'Activation_Analysis', results, summary: { TotalActivity: total.toExponential(2) + ' Bq', DominantIsotope: topIso ? topIso.Isotope : '-', PathwaysFound: results.length } };
+    // Store results for PDF export
+    this.lastResults = { title: 'Activation_Analysis', results, summary: { TotalActivity: total.toExponential(2) + ' Bq', DominantIsotope: topIso ? topIso.Isotope : '-', PathwaysFound: results.length } };
 
-        let html = `
+    let html = `
             <!-- Summary Card -->
             <div style="background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,255,150,0.05)); 
                         padding: 1.5rem; border-radius: 12px; border: 1px solid var(--accent-cyan); 
@@ -4504,12 +4354,12 @@ class App {
                         <tbody>
         `;
 
-        results.slice(0, 25).forEach(r => {
-            const pathway = (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ');
-            const xs = r.XS > 0 ? r.XS.toFixed(2) : '-';
-            const atoms = r.Atoms ? r.Atoms.toExponential(2) : '-';
+    results.slice(0, 25).forEach(r => {
+        const pathway = (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ');
+        const xs = r.XS > 0 ? r.XS.toFixed(2) : '-';
+        const atoms = r.Atoms ? r.Atoms.toExponential(2) : '-';
 
-            html += `
+        html += `
                 <tr>
                     <td style="font-size: 0.9em;">${pathway}</td>
                     <td style="font-family: var(--font-mono);">${xs}</td>
@@ -4517,9 +4367,9 @@ class App {
                     <td style="font-family: var(--font-mono);">${atoms}</td>
                 </tr>
             `;
-        });
+    });
 
-        html += `
+    html += `
                         </tbody>
                     </table>
                 </div>
@@ -4537,52 +4387,52 @@ class App {
             </div>
         `;
 
-        area.innerHTML = html;
+    area.innerHTML = html;
 
-        // Render charts and setup PDF export button
-        setTimeout(() => {
-            renderActivityPieChart(pieChartId, results);
+    // Render charts and setup PDF export button
+    setTimeout(() => {
+        renderActivityPieChart(pieChartId, results);
 
-            // Render decay chart for top isotope
-            if (topIso && this.solver) {
-                const lambda = this.solver.lambdaCache.get(topIso.Isotope) || 0;
-                if (lambda > 0) {
-                    const halfLifeSeconds = Math.log(2) / lambda;
-                    // Determine appropriate time range based on half-life
-                    const maxDays = Math.min(Math.max(halfLifeSeconds / 86400 * 5, 30), 365 * 10);
-                    renderDecayChart(`${targetId}-decay-chart`, topIso.Isotope, topIso.Activity, halfLifeSeconds, maxDays);
-                }
+        // Render decay chart for top isotope
+        if (topIso && this.solver) {
+            const lambda = this.solver.lambdaCache.get(topIso.Isotope) || 0;
+            if (lambda > 0) {
+                const halfLifeSeconds = Math.log(2) / lambda;
+                // Determine appropriate time range based on half-life
+                const maxDays = Math.min(Math.max(halfLifeSeconds / 86400 * 5, 30), 365 * 10);
+                renderDecayChart(`${targetId}-decay-chart`, topIso.Isotope, topIso.Activity, halfLifeSeconds, maxDays);
             }
+        }
 
-            // Setup PDF export button
-            const pdfBtn = document.getElementById(`btn-export-pdf-${targetId}`);
-            if (pdfBtn) {
-                pdfBtn.addEventListener('click', () => {
-                    const pdfData = results.map(r => ({
-                        Pathway: (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ').substring(0, 40),
-                        'Activity (Bq)': r.Activity.toExponential(2),
-                        'Cross Section': r.XS > 0 ? r.XS.toFixed(2) : '-',
-                        Atoms: r.Atoms ? r.Atoms.toExponential(2) : '-'
-                    }));
-                    exportToPDF('Activation_Analysis', pdfData, {
-                        TotalActivity: total.toExponential(2) + ' Bq',
-                        DominantIsotope: topIso ? topIso.Isotope : '-',
-                        PathwaysFound: results.length
-                    });
+        // Setup PDF export button
+        const pdfBtn = document.getElementById(`btn-export-pdf-${targetId}`);
+        if (pdfBtn) {
+            pdfBtn.addEventListener('click', () => {
+                const pdfData = results.map(r => ({
+                    Pathway: (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ').substring(0, 40),
+                    'Activity (Bq)': r.Activity.toExponential(2),
+                    'Cross Section': r.XS > 0 ? r.XS.toFixed(2) : '-',
+                    Atoms: r.Atoms ? r.Atoms.toExponential(2) : '-'
+                }));
+                exportToPDF('Activation_Analysis', pdfData, {
+                    TotalActivity: total.toExponential(2) + ' Bq',
+                    DominantIsotope: topIso ? topIso.Isotope : '-',
+                    PathwaysFound: results.length
                 });
-            }
-        }, 50);
-    }
+            });
+        }
+    }, 50);
+}
 
-    showToast(msg, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = msg;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
+showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
 }
 
 // Start the Application

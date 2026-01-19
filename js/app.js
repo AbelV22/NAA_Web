@@ -13,6 +13,7 @@ import { PERIODIC_TABLE } from './utils/PeriodicTable.js';
 import { renderActivityPieChart, renderComplianceBarChart, renderDecayChart } from './utils/Charts.js';
 import { exportToPDF } from './utils/PDF.js';
 import { PasswordGate } from './auth/PasswordGate.js';
+import { Presets } from './store/Presets.js';
 
 class App {
     constructor() {
@@ -138,7 +139,133 @@ class App {
             if (e.target.classList.contains('btn-remove-item')) {
                 e.target.parentElement.remove();
             }
+            // Start Presets Logic
+            if (e.target.closest('.btn-save-preset')) {
+                const type = e.target.closest('.btn-save-preset').dataset.type;
+                this.handleSavePreset(type);
+            }
+            if (e.target.closest('.btn-load-preset')) {
+                const type = e.target.closest('.btn-load-preset').dataset.type;
+                this.handleLoadPreset(type);
+            }
+            // End Presets Logic
         });
+    }
+
+    // --- PRESETS HELPERS ---
+    getSingleIsotopeData() {
+        return {
+            iso: document.getElementById('input-iso').value,
+            mass: document.getElementById('input-mass').value,
+            flux: document.getElementById('input-flux').value,
+            time: document.getElementById('input-time').value,
+            cool: document.getElementById('input-cool').value
+        };
+    }
+    setSingleIsotopeData(data) {
+        if (!data) return;
+        if (data.iso) document.getElementById('input-iso').value = data.iso;
+        if (data.mass) document.getElementById('input-mass').value = data.mass;
+        if (data.flux) document.getElementById('input-flux').value = data.flux;
+        if (data.time) document.getElementById('input-time').value = data.time;
+        if (data.cool) document.getElementById('input-cool').value = data.cool;
+    }
+
+    getImpurityData() {
+        // We only save the main inputs, not the list for now (or maybe we should?)
+        // Let's safe the main inputs to simplify first version
+        return {
+            mass: document.getElementById('imp-mass').value,
+            flux: document.getElementById('imp-flux').value,
+            time: document.getElementById('imp-time').value,
+            cool: document.getElementById('imp-cool').value
+        };
+    }
+    setImpurityData(data) {
+        if (!data) return;
+        if (data.mass) document.getElementById('imp-mass').value = data.mass;
+        if (data.flux) document.getElementById('imp-flux').value = data.flux;
+        if (data.time) document.getElementById('imp-time').value = data.time;
+        if (data.cool) document.getElementById('imp-cool').value = data.cool;
+    }
+
+    getWasteData() {
+        return {
+            mass: document.getElementById('waste-mass').value,
+            total: document.getElementById('waste-total').value,
+            flux: document.getElementById('waste-flux').value,
+            time: document.getElementById('waste-time').value,
+            cool: document.getElementById('waste-cool').value
+        };
+    }
+    setWasteData(data) {
+        if (!data) return;
+        if (data.mass) document.getElementById('waste-mass').value = data.mass;
+        if (data.total) document.getElementById('waste-total').value = data.total;
+        if (data.flux) document.getElementById('waste-flux').value = data.flux;
+        if (data.time) document.getElementById('waste-time').value = data.time;
+        if (data.cool) document.getElementById('waste-cool').value = data.cool;
+    }
+
+    getLimitData() {
+        return {
+            mass: document.getElementById('lim-mass').value,
+            wmass: document.getElementById('lim-wmass').value,
+            flux: document.getElementById('lim-flux').value,
+            time: document.getElementById('lim-time').value,
+            cool: document.getElementById('lim-cool').value,
+            type: document.getElementById('lim-type').value
+        };
+    }
+    setLimitData(data) {
+        if (!data) return;
+        if (data.mass) document.getElementById('lim-mass').value = data.mass;
+        if (data.wmass) document.getElementById('lim-wmass').value = data.wmass;
+        if (data.flux) document.getElementById('lim-flux').value = data.flux;
+        if (data.time) document.getElementById('lim-time').value = data.time;
+        if (data.cool) document.getElementById('lim-cool').value = data.cool;
+        if (data.type) document.getElementById('lim-type').value = data.type;
+    }
+
+    handleSavePreset(type) {
+        let data = null;
+        if (type === 'single') data = this.getSingleIsotopeData();
+        if (type === 'impurity') data = this.getImpurityData();
+        if (type === 'waste') data = this.getWasteData();
+        if (type === 'limit') data = this.getLimitData();
+
+        if (!data) return;
+
+        const name = prompt('Enter a name for this preset:');
+        if (name) {
+            Presets.save(type, name, data);
+            this.showToast('Preset saved!', 'success');
+        }
+    }
+
+    handleLoadPreset(type) {
+        const list = Presets.getList(type);
+        if (list.length === 0) return this.showToast('No presets found', 'warning');
+
+        // Simple prompt for now, could be a better modal later
+        let msg = "Available Presets:\n";
+        list.forEach((n, i) => msg += `${i + 1}. ${n}\n`);
+        msg += "\nEnter the number of the preset to load:";
+
+        const choice = prompt(msg);
+        const idx = parseInt(choice) - 1;
+
+        if (idx >= 0 && idx < list.length) {
+            const name = list[idx];
+            const data = Presets.load(type, name);
+
+            if (type === 'single') this.setSingleIsotopeData(data);
+            if (type === 'impurity') this.setImpurityData(data);
+            if (type === 'waste') this.setWasteData(data);
+            if (type === 'limit') this.setLimitData(data);
+
+            this.showToast(`Loaded "${name}"`, 'success');
+        }
     }
 
     renderSingleIsotopeForm() {
@@ -158,6 +285,10 @@ class App {
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Single Isotope Activation</h2>
+                    <div style="display:flex; gap:0.5rem; margin-right:auto; margin-left:1rem;">
+                        <button class="btn-secondary btn-save-preset" data-type="single" title="Save Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></button>
+                        <button class="btn-secondary btn-load-preset" data-type="single" title="Load Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></button>
+                    </div>
                     <button class="help-btn" data-help="help-single">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
                         How it works
@@ -224,6 +355,10 @@ class App {
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Impurity Activation</h2>
+                    <div style="display:flex; gap:0.5rem; margin-right:auto; margin-left:1rem;">
+                        <button class="btn-secondary btn-save-preset" data-type="impurity" title="Save Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></button>
+                        <button class="btn-secondary btn-load-preset" data-type="impurity" title="Load Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></button>
+                    </div>
                     <button class="help-btn" data-help="help-imp">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
                         How it works
@@ -283,6 +418,10 @@ class App {
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Waste Compliance</h2>
+                    <div style="display:flex; gap:0.5rem; margin-right:auto; margin-left:1rem;">
+                        <button class="btn-secondary btn-save-preset" data-type="waste" title="Save Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></button>
+                        <button class="btn-secondary btn-load-preset" data-type="waste" title="Load Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></button>
+                    </div>
                     <button class="help-btn" data-help="help-waste">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
                         About Compliance
@@ -340,6 +479,10 @@ class App {
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Limit ppm Calculator</h2>
+                    <div style="display:flex; gap:0.5rem; margin-right:auto; margin-left:1rem;">
+                        <button class="btn-secondary btn-save-preset" data-type="limit" title="Save Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></button>
+                        <button class="btn-secondary btn-load-preset" data-type="limit" title="Load Preset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></button>
+                    </div>
                     <button class="help-btn" data-help="help-limit">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
                         Reverse Logic

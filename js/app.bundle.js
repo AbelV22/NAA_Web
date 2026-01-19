@@ -3381,13 +3381,17 @@ class NuclearSolver {
 // --- js/auth/PasswordGate.js ---
 /**
  * Password Gate for Nuclear Calculator
- * Simple client-side protection for internal company use
+ * Uses SHA-256 hashing for password obfuscation
  */
 
 const PasswordGate = {
-    // SHA-256 hash of the password (for basic obfuscation)
-    // Default password: "NuclearITM2026"
-    passwordHash: '8a5dc5c7b3e5c3e5b3a5d5c7b3e5c3e5b3a5d5c7b3e5c3e5b3a5d5c7b3e5c3e5',
+    // SHA-256 hashes of valid passwords (not the actual passwords!)
+    // Use password_helper.html to generate new hashes
+    validHashes: [
+        '5bc997939c2cd911d2586194ef3c39561cae6b1feaee12c018769373ff5c8ba7', // Primary password
+        'ca42ab62fb0648630652295abc093e9be251f139c0b3d19fa93803bfda697c33', // Alternative 1
+        'c407f90d5044ce805a8efdbd1201c92bbce169b139b42c52665247cf9a01db2f'  // Alternative 2
+    ],
 
     // Storage key
     storageKey: 'nuclear_calc_auth',
@@ -3412,33 +3416,30 @@ const PasswordGate = {
     },
 
     /**
-     * Simple hash function (for basic obfuscation - not cryptographically secure)
-     * For internal company use, this provides reasonable protection
+     * SHA-256 hash function using Web Crypto API
      */
-    simpleHash(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return Math.abs(hash).toString(16);
+    async sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
     },
 
     /**
-     * Verify password
+     * Verify password against stored hashes
      */
-    verifyPassword(password) {
-        // Simple verification - check against known passwords
-        const validPasswords = ['NuclearITM2026', 'ITM2026', 'nuclear'];
-        return validPasswords.includes(password);
+    async verifyPassword(password) {
+        const inputHash = await this.sha256(password);
+        return this.validHashes.includes(inputHash);
     },
 
     /**
      * Authenticate and save session
      */
-    authenticate(password) {
-        if (this.verifyPassword(password)) {
+    async authenticate(password) {
+        const isValid = await this.verifyPassword(password);
+        if (isValid) {
             const session = {
                 authenticated: true,
                 expires: Date.now() + this.sessionDuration
@@ -3459,7 +3460,11 @@ const PasswordGate = {
     /**
      * Create and show login overlay
      */
-    showLoginScreen() {
+    /**
+     * Create and show login overlay
+     * @param {Function} onLoginSuccess Callback when login is successful
+     */
+    showLoginScreen(onLoginSuccess) {
         const overlay = document.createElement('div');
         overlay.id = 'password-gate';
         overlay.innerHTML = `
@@ -3636,16 +3641,18 @@ const PasswordGate = {
         const passwordInput = document.getElementById('gate-password');
         const errorEl = document.getElementById('gate-error');
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const password = passwordInput.value;
 
-            if (this.authenticate(password)) {
+            const isValid = await this.authenticate(password);
+            if (isValid) {
                 overlay.style.opacity = '0';
                 overlay.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => {
                     overlay.remove();
                     style.remove();
+                    if (onLoginSuccess) onLoginSuccess();
                 }, 300);
             } else {
                 errorEl.textContent = 'Invalid access code. Please try again.';
@@ -3661,13 +3668,18 @@ const PasswordGate = {
 
     /**
      * Initialize - check auth and show login if needed
+     * Returns a Promise that resolves when authenticated
      */
-    init() {
-        if (!this.isAuthenticated()) {
-            this.showLoginScreen();
-            return false;
+    async init() {
+        if (this.isAuthenticated()) {
+            return true;
         }
-        return true;
+
+        return new Promise((resolve) => {
+            this.showLoginScreen(() => {
+                resolve(true);
+            });
+        });
     }
 };
 
@@ -3698,10 +3710,11 @@ class App {
         this.init();
     }
 
-    init() {
+    async init() {
         try {
             // Security Check
-            if (!PasswordGate.init()) return;
+            await PasswordGate.init();
+            console.log('Authentication successful. Resuming initialization...');
 
             console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 

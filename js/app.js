@@ -12,137 +12,149 @@ import { SECONDS_PER_DAY } from './utils/Constants.js';
 import { PERIODIC_TABLE } from './utils/PeriodicTable.js';
 import { renderActivityPieChart, renderComplianceBarChart, renderDecayChart } from './utils/Charts.js';
 import { exportToPDF } from './utils/PDF.js';
+import { PasswordGate } from './auth/PasswordGate.js';
+
+class App {
+    constructor() {
+        this.dataLoader = new DataLoader();
+        this.solver = null;
+        this.init();
+    }
 
     async init() {
-    try {
-        console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
+        try {
+            // Security Check
+            const isAuthenticated = await PasswordGate.init();
+            if (!isAuthenticated) return;
 
-        // Initialize UI
-        this.setupNavigation();
-        this.setupAutocomplete();
-        this.renderSingleIsotopeForm();
-        this.renderImpurityForm();
-        this.renderWasteForm();
-        this.renderLimitForm();
-        this.setupEventListeners();
+            console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 
-        this.dataLoader.loadAll()
-            .then(() => {
-                const state = appStore.getState();
-                if (state.dataLoaded) {
-                    this.solver = new NuclearSolver(state.xsData, state.chainData, state.limitsData);
-                    console.log('Math Engine Initialized');
-                }
-                console.log('App ready');
-                // Hide any initial loading spinner if applicable
-            })
-            .catch(err => {
-                console.error('Data loading error:', err);
-                this.showError('Database Error', `Failed to load nuclear data CSV files. Check if they exist in public/data/. Details: ${err.message}`);
-            });
-    } catch (error) {
-        console.error('Initialization Error:', error);
-        this.showError('Application Error', `Failed to initialize the tool. Details: ${error.message}`);
+            // Initialize UI
+            this.setupNavigation();
+            this.setupAutocomplete();
+            this.renderSingleIsotopeForm();
+            this.renderImpurityForm();
+            this.renderWasteForm();
+            this.renderLimitForm();
+            this.setupEventListeners();
+
+            this.dataLoader.loadAll()
+                .then(() => {
+                    const state = appStore.getState();
+                    if (state.dataLoaded) {
+                        this.solver = new NuclearSolver(state.xsData, state.chainData, state.limitsData);
+                        console.log('Math Engine Initialized');
+                    }
+                    console.log('App ready');
+                    // Hide any initial loading spinner if applicable
+                })
+                .catch(err => {
+                    console.error('Data loading error:', err);
+                    this.showError('Database Error', `Failed to load nuclear data CSV files. Check if they exist in public/data/. Details: ${err.message}`);
+                });
+        } catch (error) {
+            console.error('Initialization Error:', error);
+            this.showError('Application Error', `Failed to initialize the tool. Details: ${error.message}`);
+        }
     }
-}
 
-showError(title, msg) {
-    const modal = document.createElement('div');
-    modal.className = 'card';
-    modal.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:100000; padding:2rem; background:#1a1a3a; border:2px solid #ff6b6b; color:white; max-width:500px; box-shadow:0 0 50px rgba(0,0,0,0.8);';
-    modal.innerHTML = `
+    showError(title, msg) {
+        const modal = document.createElement('div');
+        modal.className = 'card';
+        modal.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:100000; padding:2rem; background:#1a1a3a; border:2px solid #ff6b6b; color:white; max-width:500px; box-shadow:0 0 50px rgba(0,0,0,0.8);';
+        modal.innerHTML = `
             <h2 style="color:#ff6b6b; margin-top:0;">⚠️ ${title}</h2>
             <p>${msg}</p>
             <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem; width:100%;">Retry / Refresh</button>
         `;
-    document.body.appendChild(modal);
-}
+        document.body.appendChild(modal);
+    }
 
-setupNavigation() {
-    const tabs = document.querySelectorAll('.nav-tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const target = tab.dataset.tab;
-            appStore.setState({ activeTab: target });
-            this.updateActiveTabs(target);
+    setupNavigation() {
+        const tabs = document.querySelectorAll('.nav-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                appStore.setState({ activeTab: target });
+                this.updateActiveTabs(target);
+            });
         });
-    });
-    appStore.subscribe((state) => {
-        this.updateActiveTabs(state.activeTab);
-    });
-}
+        appStore.subscribe((state) => {
+            this.updateActiveTabs(state.activeTab);
+        });
+    }
 
-updateActiveTabs(activeId) {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeId));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${activeId}`));
-}
+    updateActiveTabs(activeId) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeId));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${activeId}`));
+    }
 
-setupAutocomplete() {
-    const list = document.createElement('datalist');
-    list.id = 'elements-list';
-    PERIODIC_TABLE.forEach(elem => {
-        const opt = document.createElement('option');
-        opt.value = elem;
-        list.appendChild(opt);
-    });
-    document.body.appendChild(list);
-}
+    setupAutocomplete() {
+        const list = document.createElement('datalist');
+        list.id = 'elements-list';
+        PERIODIC_TABLE.forEach(elem => {
+            const opt = document.createElement('option');
+            opt.value = elem;
+            list.appendChild(opt);
+        });
+        document.body.appendChild(list);
+    }
 
-setupEventListeners() {
-    bus.on(EVENTS.CALCULATION_START, () => this.handleCalculation());
+    setupEventListeners() {
+        bus.on(EVENTS.CALCULATION_START, () => this.handleCalculation());
 
-    // Delegate Event Listeners for dynamic elements
-    document.body.addEventListener('click', (e) => {
-        const id = e.target.id;
-        if (id === 'btn-calculate') this.handleCalculation();
+        // Delegate Event Listeners for dynamic elements
+        document.body.addEventListener('click', (e) => {
+            const id = e.target.id;
+            if (id === 'btn-calculate') this.handleCalculation();
 
-        // Impurity Strings
-        if (id === 'btn-add-imp') this.addImpurityItem();
-        if (id === 'btn-calc-imp') this.handleImpurityCalculation();
+            // Impurity Strings
+            if (id === 'btn-add-imp') this.addImpurityItem();
+            if (id === 'btn-calc-imp') this.handleImpurityCalculation();
 
-        // Waste Strings
-        if (id === 'btn-add-waste-imp') this.addWasteItem();
-        if (id === 'btn-calc-waste') this.handleWasteCalculation();
+            // Waste Strings
+            if (id === 'btn-add-waste-imp') this.addWasteItem();
+            if (id === 'btn-calc-waste') this.handleWasteCalculation();
 
-        // Limit Strings
-        if (id === 'btn-add-lim') this.addLimitItem();
-        if (id === 'btn-calc-lim') this.handleLimitCalculation();
+            // Limit Strings
+            if (id === 'btn-add-lim') this.addLimitItem();
+            if (id === 'btn-calc-lim') this.handleLimitCalculation();
 
-        // Help Toggle logic
-        if (e.target.classList.contains('help-btn') || e.target.closest('.help-btn')) {
-            const btn = e.target.classList.contains('help-btn') ? e.target : e.target.closest('.help-btn');
-            const targetId = btn.dataset.help;
-            const panel = document.getElementById(targetId);
-            if (panel) {
-                panel.classList.toggle('active');
+            // Help Toggle logic
+            if (e.target.classList.contains('help-btn') || e.target.closest('.help-btn')) {
+                const btn = e.target.classList.contains('help-btn') ? e.target : e.target.closest('.help-btn');
+                const targetId = btn.dataset.help;
+                const panel = document.getElementById(targetId);
+                if (panel) {
+                    panel.classList.toggle('active');
+                }
             }
-        }
 
-        // Manual triggers
-        if (id === 'btn-open-manual') document.getElementById('manual-modal').classList.add('active');
-        if (id === 'btn-close-manual') document.getElementById('manual-modal').classList.remove('active');
+            // Manual triggers
+            if (id === 'btn-open-manual') document.getElementById('manual-modal').classList.add('active');
+            if (id === 'btn-close-manual') document.getElementById('manual-modal').classList.remove('active');
 
-        // Remove buttons
-        if (e.target.classList.contains('btn-remove-item')) {
-            e.target.parentElement.remove();
-        }
-    });
-}
+            // Remove buttons
+            if (e.target.classList.contains('btn-remove-item')) {
+                e.target.parentElement.remove();
+            }
+        });
+    }
 
-renderSingleIsotopeForm() {
-    const container = document.getElementById('tab-single-isotope');
-    if (!container) return;
+    renderSingleIsotopeForm() {
+        const container = document.getElementById('tab-single-isotope');
+        if (!container) return;
 
-    // Define SVG icons inline for performance
-    const icons = {
-        atom: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/></svg>',
-        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-    };
+        // Define SVG icons inline for performance
+        const icons = {
+            atom: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/></svg>',
+            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+        };
 
-    container.innerHTML = `
+        container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Single Isotope Activation</h2>
@@ -194,21 +206,21 @@ renderSingleIsotopeForm() {
                 <div id="results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>
         `;
-}
+    }
 
-renderImpurityForm() {
-    const container = document.getElementById('tab-impurity');
-    if (!container) return;
+    renderImpurityForm() {
+        const container = document.getElementById('tab-impurity');
+        if (!container) return;
 
-    const icons = {
-        element: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="currentColor">Fe</text></svg>',
-        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-    };
+        const icons = {
+            element: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="currentColor">Fe</text></svg>',
+            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+        };
 
-    container.innerHTML = `
+        container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Impurity Activation</h2>
@@ -253,21 +265,21 @@ renderImpurityForm() {
                 </div>
                 <div id="imp-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
-}
+    }
 
-renderWasteForm() {
-    const container = document.getElementById('tab-waste');
-    if (!container) return;
+    renderWasteForm() {
+        const container = document.getElementById('tab-waste');
+        if (!container) return;
 
-    const icons = {
-        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-        waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
-        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-    };
+        const icons = {
+            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+            waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
+            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+        };
 
-    container.innerHTML = `
+        container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Waste Compliance</h2>
@@ -310,21 +322,21 @@ renderWasteForm() {
                 <button id="btn-calc-waste" class="btn-primary">Analyze Batch</button>
                 <div id="waste-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
-}
+    }
 
-renderLimitForm() {
-    const container = document.getElementById('tab-limits');
-    if (!container) return;
+    renderLimitForm() {
+        const container = document.getElementById('tab-limits');
+        if (!container) return;
 
-    const icons = {
-        mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
-        waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
-        flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
-        time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-        cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
-    };
+        const icons = {
+            mass: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M6 8h12l-2 13H8L6 8z"/></svg>',
+            waste: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>',
+            flux: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            time: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+            cool: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>'
+        };
 
-    container.innerHTML = `
+        container.innerHTML = `
             <div class="panel card">
                 <div class="panel-header">
                     <h2 class="panel-title">Limit ppm Calculator</h2>
@@ -388,154 +400,154 @@ renderLimitForm() {
                 <button id="btn-calc-lim" class="btn-primary">Calculate Max ppm</button>
                 <div id="lim-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
-}
-
-handleCalculation() {
-    if (!this.solver) {
-        this.showToast('Engine not ready yet', 'error');
-        return;
     }
 
-    const iso = document.getElementById('input-iso').value;
-    const mass = parseFloat(document.getElementById('input-mass').value);
-    const fluxStr = document.getElementById('input-flux').value;
-    const time = parseFloat(document.getElementById('input-time').value);
-    const cool = parseFloat(document.getElementById('input-cool').value);
+    handleCalculation() {
+        if (!this.solver) {
+            this.showToast('Engine not ready yet', 'error');
+            return;
+        }
 
-    const flux = parseFloat(fluxStr);
-    const tIrrS = time * SECONDS_PER_DAY;
-    const tCoolS = cool * SECONDS_PER_DAY;
+        const iso = document.getElementById('input-iso').value;
+        const mass = parseFloat(document.getElementById('input-mass').value);
+        const fluxStr = document.getElementById('input-flux').value;
+        const time = parseFloat(document.getElementById('input-time').value);
+        const cool = parseFloat(document.getElementById('input-cool').value);
 
-    this.showToast('Computing...', 'info');
+        const flux = parseFloat(fluxStr);
+        const tIrrS = time * SECONDS_PER_DAY;
+        const tCoolS = cool * SECONDS_PER_DAY;
 
-    try {
-        const results = this.solver.solve(iso, mass, flux, tIrrS, tCoolS);
-        this.renderResults(results, 'results-area');
-        this.showToast('Calculation Complete', 'success');
-    } catch (e) {
-        console.error(e);
-        this.showToast('Calculation Error', 'error');
+        this.showToast('Computing...', 'info');
+
+        try {
+            const results = this.solver.solve(iso, mass, flux, tIrrS, tCoolS);
+            this.renderResults(results, 'results-area');
+            this.showToast('Calculation Complete', 'success');
+        } catch (e) {
+            console.error(e);
+            this.showToast('Calculation Error', 'error');
+        }
     }
-}
 
-// --- IMPURITY CALCULATOR ---
-addImpurityItem() {
-    const symStart = document.getElementById('imp-sym');
-    const ppmStart = document.getElementById('imp-ppm');
-    if (!symStart.value || !ppmStart.value) return;
+    // --- IMPURITY CALCULATOR ---
+    addImpurityItem() {
+        const symStart = document.getElementById('imp-sym');
+        const ppmStart = document.getElementById('imp-ppm');
+        if (!symStart.value || !ppmStart.value) return;
 
-    const list = document.getElementById('impurity-list');
-    const item = document.createElement('div');
-    item.className = 'impurity-tag';
-    item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;';
-    item.innerHTML = `
+        const list = document.getElementById('impurity-list');
+        const item = document.createElement('div');
+        item.className = 'impurity-tag';
+        item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;';
+        item.innerHTML = `
             <span class="imp-data" data-sym="${symStart.value}" data-ppm="${ppmStart.value}">${symStart.value}: ${ppmStart.value} ppm</span>
             <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer;">&times;</button>
         `;
-    list.appendChild(item);
-    symStart.value = '';
-    ppmStart.value = '';
-}
+        list.appendChild(item);
+        symStart.value = '';
+        ppmStart.value = '';
+    }
 
-handleImpurityCalculation() {
-    if (!this.solver) return this.showToast('Engine Loading...', 'error');
+    handleImpurityCalculation() {
+        if (!this.solver) return this.showToast('Engine Loading...', 'error');
 
-    const mass = parseFloat(document.getElementById('imp-mass').value) || 0;
-    const flux = parseFloat(document.getElementById('imp-flux').value) || 0;
-    const time = parseFloat(document.getElementById('imp-time').value) || 0;
-    const cool = parseFloat(document.getElementById('imp-cool').value) || 0;
+        const mass = parseFloat(document.getElementById('imp-mass').value) || 0;
+        const flux = parseFloat(document.getElementById('imp-flux').value) || 0;
+        const time = parseFloat(document.getElementById('imp-time').value) || 0;
+        const cool = parseFloat(document.getElementById('imp-cool').value) || 0;
 
-    const tIrrS = time * SECONDS_PER_DAY;
-    const tCoolS = cool * SECONDS_PER_DAY;
+        const tIrrS = time * SECONDS_PER_DAY;
+        const tCoolS = cool * SECONDS_PER_DAY;
 
-    const items = document.querySelectorAll('#impurity-list .imp-data');
-    if (items.length === 0) return this.showToast('Add impurities first', 'warning');
+        const items = document.querySelectorAll('#impurity-list .imp-data');
+        if (items.length === 0) return this.showToast('Add impurities first', 'warning');
 
-    this.showToast('Calculating...', 'info');
+        this.showToast('Calculating...', 'info');
 
-    try {
-        let combinedResults = [];
-        items.forEach(node => {
+        try {
+            let combinedResults = [];
+            items.forEach(node => {
+                const sym = node.dataset.sym;
+                const ppm = parseFloat(node.dataset.ppm);
+                const elemMass = (ppm / 1e6) * mass;
+
+                const res = this.solver.solveElement(sym, elemMass, flux, tIrrS, tCoolS);
+                combinedResults.push(...res);
+            });
+
+            // Merge
+            const finalMap = new Map();
+            combinedResults.forEach(r => {
+                if (!finalMap.has(r.Isotope)) {
+                    finalMap.set(r.Isotope, { ...r, Activity: 0, Atoms: 0 });
+                }
+                const ex = finalMap.get(r.Isotope);
+                ex.Activity += r.Activity;
+                ex.Atoms += r.Atoms;
+            });
+
+            const results = Array.from(finalMap.values()).sort((a, b) => b.Activity - a.Activity);
+            this.renderResults(results, 'imp-results-area');
+            this.showToast('Impurity Analysis Complete', 'success');
+
+        } catch (e) {
+            console.error(e);
+            this.showToast('Analysis Error', 'error');
+        }
+    }
+
+    // --- WASTE CALCULATOR ---
+    addWasteItem() {
+        const sym = document.getElementById('waste-imp-sym').value;
+        const ppm = document.getElementById('waste-imp-ppm').value;
+        if (!sym || !ppm) return;
+        const list = document.getElementById('waste-imp-list');
+        const item = document.createElement('div');
+        item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; margin-right: 4px; margin-bottom: 4px;';
+        item.innerHTML = `<span class="waste-data" data-sym="${sym}" data-ppm="${ppm}">${sym}: ${ppm} ppm</span> <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer;">x</button>`;
+        list.appendChild(item);
+        document.getElementById('waste-imp-sym').value = '';
+        document.getElementById('waste-imp-ppm').value = '';
+    }
+
+    handleWasteCalculation() {
+        if (!this.solver) return;
+        const mass = parseFloat(document.getElementById('waste-mass').value) || 0;
+        const totalWaste = parseFloat(document.getElementById('waste-total').value) || 0;
+        const flux = parseFloat(document.getElementById('waste-flux').value) || 0;
+        const time = parseFloat(document.getElementById('waste-time').value) || 0;
+        const cool = parseFloat(document.getElementById('waste-cool').value) || 0;
+
+        const tIrrS = time * SECONDS_PER_DAY;
+        const tCoolS = cool * SECONDS_PER_DAY;
+
+        // Get Impurities
+        const impurities = {};
+        document.querySelectorAll('#waste-imp-list .waste-data').forEach(node => {
             const sym = node.dataset.sym;
             const ppm = parseFloat(node.dataset.ppm);
-            const elemMass = (ppm / 1e6) * mass;
-
-            const res = this.solver.solveElement(sym, elemMass, flux, tIrrS, tCoolS);
-            combinedResults.push(...res);
+            impurities[sym] = ppm;
         });
 
-        // Merge
-        const finalMap = new Map();
-        combinedResults.forEach(r => {
-            if (!finalMap.has(r.Isotope)) {
-                finalMap.set(r.Isotope, { ...r, Activity: 0, Atoms: 0 });
-            }
-            const ex = finalMap.get(r.Isotope);
-            ex.Activity += r.Activity;
-            ex.Atoms += r.Atoms;
-        });
+        if (Object.keys(impurities).length === 0) return this.showToast('Add impurities first', 'warning');
 
-        const results = Array.from(finalMap.values()).sort((a, b) => b.Activity - a.Activity);
-        this.renderResults(results, 'imp-results-area');
-        this.showToast('Impurity Analysis Complete', 'success');
+        this.showToast('Analyzing Batch...', 'info');
 
-    } catch (e) {
-        console.error(e);
-        this.showToast('Analysis Error', 'error');
-    }
-}
+        try {
+            // Call Engine
+            // Assuming "H" as dummy main element or null, using 'exemption' for now based on logic2.py logic for incineration/dumping?
+            // "Limit_Incineration_100t_Bq_g" was hinted in logic2.py, but usually we use 'clearance' or 'exemption'.
+            // Let's default to 'exemption' as a safer "waste" limit, but ideally UI should allow selection.
+            // For now, hardcode 'exemption' to match typical waste compliance checks.
+            const limitType = 'exemption';
 
-// --- WASTE CALCULATOR ---
-addWasteItem() {
-    const sym = document.getElementById('waste-imp-sym').value;
-    const ppm = document.getElementById('waste-imp-ppm').value;
-    if (!sym || !ppm) return;
-    const list = document.getElementById('waste-imp-list');
-    const item = document.createElement('div');
-    item.style.cssText = 'background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; margin-right: 4px; margin-bottom: 4px;';
-    item.innerHTML = `<span class="waste-data" data-sym="${sym}" data-ppm="${ppm}">${sym}: ${ppm} ppm</span> <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer;">x</button>`;
-    list.appendChild(item);
-    document.getElementById('waste-imp-sym').value = '';
-    document.getElementById('waste-imp-ppm').value = '';
-}
+            const results = this.solver.calculateWasteCompliance(
+                impurities, null, mass, flux, tIrrS, tCoolS, totalWaste, limitType
+            );
 
-handleWasteCalculation() {
-    if (!this.solver) return;
-    const mass = parseFloat(document.getElementById('waste-mass').value) || 0;
-    const totalWaste = parseFloat(document.getElementById('waste-total').value) || 0;
-    const flux = parseFloat(document.getElementById('waste-flux').value) || 0;
-    const time = parseFloat(document.getElementById('waste-time').value) || 0;
-    const cool = parseFloat(document.getElementById('waste-cool').value) || 0;
-
-    const tIrrS = time * SECONDS_PER_DAY;
-    const tCoolS = cool * SECONDS_PER_DAY;
-
-    // Get Impurities
-    const impurities = {};
-    document.querySelectorAll('#waste-imp-list .waste-data').forEach(node => {
-        const sym = node.dataset.sym;
-        const ppm = parseFloat(node.dataset.ppm);
-        impurities[sym] = ppm;
-    });
-
-    if (Object.keys(impurities).length === 0) return this.showToast('Add impurities first', 'warning');
-
-    this.showToast('Analyzing Batch...', 'info');
-
-    try {
-        // Call Engine
-        // Assuming "H" as dummy main element or null, using 'exemption' for now based on logic2.py logic for incineration/dumping?
-        // "Limit_Incineration_100t_Bq_g" was hinted in logic2.py, but usually we use 'clearance' or 'exemption'.
-        // Let's default to 'exemption' as a safer "waste" limit, but ideally UI should allow selection.
-        // For now, hardcode 'exemption' to match typical waste compliance checks.
-        const limitType = 'exemption';
-
-        const results = this.solver.calculateWasteCompliance(
-            impurities, null, mass, flux, tIrrS, tCoolS, totalWaste, limitType
-        );
-
-        // Render Results
-        let html = `
+            // Render Results
+            let html = `
                 <div style="background: ${results.summary.isCompliant ? 'rgba(0,255,150,0.1)' : 'rgba(255,100,100,0.1)'}; 
                             padding: 1.5rem; border-radius: 12px; border: 1px solid ${results.summary.isCompliant ? 'var(--accent-green)' : 'var(--accent-red)'}; 
                             margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
@@ -565,8 +577,8 @@ handleWasteCalculation() {
                     </thead>
                     <tbody>`;
 
-        results.results.forEach(r => {
-            html += `
+            results.results.forEach(r => {
+                html += `
                     <tr>
                         <td>${r.Isotope}</td>
                         <td style="font-family: var(--font-mono);">${r.ActivityTotal.toExponential(2)}</td>
@@ -574,9 +586,9 @@ handleWasteCalculation() {
                         <td style="font-family: var(--font-mono);">${r.Limit.toExponential(2)}</td>
                         <td style="font-weight: bold; color: ${r.Fraction > 1 ? 'var(--accent-red)' : 'var(--text-primary)'};">${r.Fraction.toFixed(4)}</td>
                     </tr>`;
-        });
+            });
 
-        html += `</tbody></table>
+            html += `</tbody></table>
             
             <!-- Charts Section -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
@@ -588,52 +600,52 @@ handleWasteCalculation() {
                 </div>
             </div>`;
 
-        document.getElementById('waste-results-area').innerHTML = html;
+            document.getElementById('waste-results-area').innerHTML = html;
 
-        // Render Charts (after DOM update)
-        setTimeout(() => {
-            // Prepare data for charts
-            const chartData = results.results.map(r => ({
-                Isotope: r.Isotope,
-                isotope: r.Isotope,
-                Activity: r.ActivityTotal,
-                fraction: r.Fraction
-            }));
+            // Render Charts (after DOM update)
+            setTimeout(() => {
+                // Prepare data for charts
+                const chartData = results.results.map(r => ({
+                    Isotope: r.Isotope,
+                    isotope: r.Isotope,
+                    Activity: r.ActivityTotal,
+                    fraction: r.Fraction
+                }));
 
-            renderActivityPieChart('waste-pie-chart', chartData);
-            renderComplianceBarChart('waste-bar-chart', chartData.map(d => ({
-                isotope: d.Isotope,
-                fraction: d.fraction
-            })));
-        }, 50);
+                renderActivityPieChart('waste-pie-chart', chartData);
+                renderComplianceBarChart('waste-bar-chart', chartData.map(d => ({
+                    isotope: d.Isotope,
+                    fraction: d.fraction
+                })));
+            }, 50);
 
-        this.showToast('Analysis Complete', 'success');
+            this.showToast('Analysis Complete', 'success');
 
-    } catch (e) {
-        console.error(e);
-        this.showToast('Compliance Error', 'error');
+        } catch (e) {
+            console.error(e);
+            this.showToast('Compliance Error', 'error');
+        }
     }
-}
 
-// --- LIMIT CALCULATOR ---
-addLimitItem() {
-    const symStart = document.getElementById('lim-sym');
-    const fracStart = document.getElementById('lim-frac');
-    const wasteStart = document.getElementById('lim-waste');
+    // --- LIMIT CALCULATOR ---
+    addLimitItem() {
+        const symStart = document.getElementById('lim-sym');
+        const fracStart = document.getElementById('lim-frac');
+        const wasteStart = document.getElementById('lim-waste');
 
-    const sym = symStart.value.trim();
-    if (!sym) return;
+        const sym = symStart.value.trim();
+        if (!sym) return;
 
-    // Defaults
-    const frac = parseFloat(fracStart.value) || 100;
-    const waste = parseFloat(wasteStart.value) || 100;
+        // Defaults
+        const frac = parseFloat(fracStart.value) || 100;
+        const waste = parseFloat(wasteStart.value) || 100;
 
-    const list = document.getElementById('lim-list');
-    const item = document.createElement('div');
-    item.className = 'lim-row';
-    item.style.cssText = 'background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;';
+        const list = document.getElementById('lim-list');
+        const item = document.createElement('div');
+        item.className = 'lim-row';
+        item.style.cssText = 'background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;';
 
-    item.innerHTML = `
+        item.innerHTML = `
             <div class="lim-data" data-sym="${sym}" data-frac="${frac}" data-waste="${waste}" style="display: flex; gap: 1rem; align-items: center;">
                 <span style="font-weight: bold; width: 40px;">${sym}</span>
                 <span style="color: #aaa; font-size: 0.9em;">Frac: <span style="color: white">${frac}%</span></span>
@@ -641,52 +653,52 @@ addLimitItem() {
             </div>
             <button class="btn-remove-item" style="background:none; border:none; color: #ff6b6b; cursor: pointer; font-size: 1.2em;">&times;</button>
         `;
-    list.appendChild(item);
+        list.appendChild(item);
 
-    // Reset inputs
-    symStart.value = '';
-    // fracStart.value = '100'; // Keep defaults for rapid entry
-    // wasteStart.value = '100';
-    symStart.focus();
-}
+        // Reset inputs
+        symStart.value = '';
+        // fracStart.value = '100'; // Keep defaults for rapid entry
+        // wasteStart.value = '100';
+        symStart.focus();
+    }
 
-handleLimitCalculation() {
-    if (!this.solver) return;
-    const mass = parseFloat(document.getElementById('lim-mass').value) || 0;
-    const wMass = parseFloat(document.getElementById('lim-wmass').value) || 0;
-    const flux = parseFloat(document.getElementById('lim-flux').value) || 0;
-    const time = parseFloat(document.getElementById('lim-time').value) || 0;
-    const cool = parseFloat(document.getElementById('lim-cool').value) || 0;
-    const limitType = document.getElementById('lim-type').value;
+    handleLimitCalculation() {
+        if (!this.solver) return;
+        const mass = parseFloat(document.getElementById('lim-mass').value) || 0;
+        const wMass = parseFloat(document.getElementById('lim-wmass').value) || 0;
+        const flux = parseFloat(document.getElementById('lim-flux').value) || 0;
+        const time = parseFloat(document.getElementById('lim-time').value) || 0;
+        const cool = parseFloat(document.getElementById('lim-cool').value) || 0;
+        const limitType = document.getElementById('lim-type').value;
 
-    const tIrrS = time * SECONDS_PER_DAY;
-    const tCoolS = cool * SECONDS_PER_DAY;
+        const tIrrS = time * SECONDS_PER_DAY;
+        const tCoolS = cool * SECONDS_PER_DAY;
 
-    const elements = [];
-    const fractions = {};
-    const wasteFractions = {};
+        const elements = [];
+        const fractions = {};
+        const wasteFractions = {};
 
-    document.querySelectorAll('#lim-list .lim-data').forEach(node => {
-        const s = node.dataset.sym;
-        const f = parseFloat(node.dataset.frac) || 100;
-        const w = parseFloat(node.dataset.waste) || 100;
-        elements.push(s);
-        fractions[s] = f / 100.0; // Convert to decimal
-        wasteFractions[s] = w / 100.0; // Convert to decimal
-    });
+        document.querySelectorAll('#lim-list .lim-data').forEach(node => {
+            const s = node.dataset.sym;
+            const f = parseFloat(node.dataset.frac) || 100;
+            const w = parseFloat(node.dataset.waste) || 100;
+            elements.push(s);
+            fractions[s] = f / 100.0; // Convert to decimal
+            wasteFractions[s] = w / 100.0; // Convert to decimal
+        });
 
-    if (elements.length === 0) return this.showToast('Add target elements first', 'warning');
+        if (elements.length === 0) return this.showToast('Add target elements first', 'warning');
 
-    this.showToast(`Calculating Limits (${limitType})...`, 'info');
+        this.showToast(`Calculating Limits (${limitType})...`, 'info');
 
-    try {
-        const results = this.solver.calculateMaxPPM(
-            elements, flux, tIrrS, tCoolS, wMass, mass, limitType, fractions, wasteFractions
-        );
+        try {
+            const results = this.solver.calculateMaxPPM(
+                elements, flux, tIrrS, tCoolS, wMass, mass, limitType, fractions, wasteFractions
+            );
 
-        if (!results || results.length === 0) return this.showToast('No active isotopes found', 'warning');
+            if (!results || results.length === 0) return this.showToast('No active isotopes found', 'warning');
 
-        let html = `
+            let html = `
                 <div style="overflow-x: auto;">
                 <table class="data-table" style="width:100%; font-size: 0.9em;">
                     <thead>
@@ -705,11 +717,11 @@ handleLimitCalculation() {
                     </thead>
                     <tbody>`;
 
-        results.forEach(r => {
-            const isoPpm = r.IsoMaxPPM > 9.99e9 ? '> 1e10' : r.IsoMaxPPM.toExponential(2);
-            const elemPpm = r.ElemMaxPPM === Infinity ? 'Infinite' : (r.ElemMaxPPM > 9.99e9 ? '> 1e10' : r.ElemMaxPPM.toExponential(2));
+            results.forEach(r => {
+                const isoPpm = r.IsoMaxPPM > 9.99e9 ? '> 1e10' : r.IsoMaxPPM.toExponential(2);
+                const elemPpm = r.ElemMaxPPM === Infinity ? 'Infinite' : (r.ElemMaxPPM > 9.99e9 ? '> 1e10' : r.ElemMaxPPM.toExponential(2));
 
-            html += `
+                html += `
                     <tr>
                         <td style="font-weight: bold; color: var(--accent-cyan);">${r.Element}</td>
                         <td>${r.Parent}</td>
@@ -722,33 +734,33 @@ handleLimitCalculation() {
                         <td>${r.WastePct}</td>
                         <td>${r.FracPct}</td>
                     </tr>`;
-        });
+            });
 
-        html += `</tbody></table></div>`;
-        document.getElementById('lim-results-area').innerHTML = html;
-        this.showToast('Limits Calculated', 'success');
+            html += `</tbody></table></div>`;
+            document.getElementById('lim-results-area').innerHTML = html;
+            this.showToast('Limits Calculated', 'success');
 
-    } catch (e) {
-        console.error(e);
-        this.showToast('Limit Calc Error', 'error');
+        } catch (e) {
+            console.error(e);
+            this.showToast('Limit Calc Error', 'error');
+        }
     }
-}
 
-renderResults(results, targetId = 'results-area') {
-    const area = document.getElementById(targetId);
-    if (!area) return;
+    renderResults(results, targetId = 'results-area') {
+        const area = document.getElementById(targetId);
+        if (!area) return;
 
-    const total = results.reduce((acc, r) => acc + r.Activity, 0);
-    const topIso = results.length > 0 ? results[0] : null;
-    const topPct = topIso ? ((topIso.Activity / total) * 100).toFixed(1) : 0;
+        const total = results.reduce((acc, r) => acc + r.Activity, 0);
+        const topIso = results.length > 0 ? results[0] : null;
+        const topPct = topIso ? ((topIso.Activity / total) * 100).toFixed(1) : 0;
 
-    // Unique canvas ID based on target
-    const pieChartId = `${targetId}-pie-chart`;
+        // Unique canvas ID based on target
+        const pieChartId = `${targetId}-pie-chart`;
 
-    // Store results for PDF export
-    this.lastResults = { title: 'Activation_Analysis', results, summary: { TotalActivity: total.toExponential(2) + ' Bq', DominantIsotope: topIso ? topIso.Isotope : '-', PathwaysFound: results.length } };
+        // Store results for PDF export
+        this.lastResults = { title: 'Activation_Analysis', results, summary: { TotalActivity: total.toExponential(2) + ' Bq', DominantIsotope: topIso ? topIso.Isotope : '-', PathwaysFound: results.length } };
 
-    let html = `
+        let html = `
             <!-- Summary Card -->
             <div style="background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(0,255,150,0.05)); 
                         padding: 1.5rem; border-radius: 12px; border: 1px solid var(--accent-cyan); 
@@ -802,12 +814,12 @@ renderResults(results, targetId = 'results-area') {
                         <tbody>
         `;
 
-    results.slice(0, 25).forEach(r => {
-        const pathway = (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ');
-        const xs = r.XS > 0 ? r.XS.toFixed(2) : '-';
-        const atoms = r.Atoms ? r.Atoms.toExponential(2) : '-';
+        results.slice(0, 25).forEach(r => {
+            const pathway = (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ');
+            const xs = r.XS > 0 ? r.XS.toFixed(2) : '-';
+            const atoms = r.Atoms ? r.Atoms.toExponential(2) : '-';
 
-        html += `
+            html += `
                 <tr>
                     <td style="font-size: 0.9em;">${pathway}</td>
                     <td style="font-family: var(--font-mono);">${xs}</td>
@@ -815,9 +827,9 @@ renderResults(results, targetId = 'results-area') {
                     <td style="font-family: var(--font-mono);">${atoms}</td>
                 </tr>
             `;
-    });
+        });
 
-    html += `
+        html += `
                         </tbody>
                     </table>
                 </div>
@@ -835,52 +847,52 @@ renderResults(results, targetId = 'results-area') {
             </div>
         `;
 
-    area.innerHTML = html;
+        area.innerHTML = html;
 
-    // Render charts and setup PDF export button
-    setTimeout(() => {
-        renderActivityPieChart(pieChartId, results);
+        // Render charts and setup PDF export button
+        setTimeout(() => {
+            renderActivityPieChart(pieChartId, results);
 
-        // Render decay chart for top isotope
-        if (topIso && this.solver) {
-            const lambda = this.solver.lambdaCache.get(topIso.Isotope) || 0;
-            if (lambda > 0) {
-                const halfLifeSeconds = Math.log(2) / lambda;
-                // Determine appropriate time range based on half-life
-                const maxDays = Math.min(Math.max(halfLifeSeconds / 86400 * 5, 30), 365 * 10);
-                renderDecayChart(`${targetId}-decay-chart`, topIso.Isotope, topIso.Activity, halfLifeSeconds, maxDays);
+            // Render decay chart for top isotope
+            if (topIso && this.solver) {
+                const lambda = this.solver.lambdaCache.get(topIso.Isotope) || 0;
+                if (lambda > 0) {
+                    const halfLifeSeconds = Math.log(2) / lambda;
+                    // Determine appropriate time range based on half-life
+                    const maxDays = Math.min(Math.max(halfLifeSeconds / 86400 * 5, 30), 365 * 10);
+                    renderDecayChart(`${targetId}-decay-chart`, topIso.Isotope, topIso.Activity, halfLifeSeconds, maxDays);
+                }
             }
-        }
 
-        // Setup PDF export button
-        const pdfBtn = document.getElementById(`btn-export-pdf-${targetId}`);
-        if (pdfBtn) {
-            pdfBtn.addEventListener('click', () => {
-                const pdfData = results.map(r => ({
-                    Pathway: (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ').substring(0, 40),
-                    'Activity (Bq)': r.Activity.toExponential(2),
-                    'Cross Section': r.XS > 0 ? r.XS.toFixed(2) : '-',
-                    Atoms: r.Atoms ? r.Atoms.toExponential(2) : '-'
-                }));
-                exportToPDF('Activation_Analysis', pdfData, {
-                    TotalActivity: total.toExponential(2) + ' Bq',
-                    DominantIsotope: topIso ? topIso.Isotope : '-',
-                    PathwaysFound: results.length
+            // Setup PDF export button
+            const pdfBtn = document.getElementById(`btn-export-pdf-${targetId}`);
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', () => {
+                    const pdfData = results.map(r => ({
+                        Pathway: (r.Pathway || r.Isotope || '').replace(/n,g/g, 'n,γ').substring(0, 40),
+                        'Activity (Bq)': r.Activity.toExponential(2),
+                        'Cross Section': r.XS > 0 ? r.XS.toFixed(2) : '-',
+                        Atoms: r.Atoms ? r.Atoms.toExponential(2) : '-'
+                    }));
+                    exportToPDF('Activation_Analysis', pdfData, {
+                        TotalActivity: total.toExponential(2) + ' Bq',
+                        DominantIsotope: topIso ? topIso.Isotope : '-',
+                        PathwaysFound: results.length
+                    });
                 });
-            });
-        }
-    }, 50);
-}
+            }
+        }, 50);
+    }
 
-showToast(msg, type = 'info') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
+    showToast(msg, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 }
 
 // Start the Application

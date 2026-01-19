@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal NAA Tool | ITM Medical Isotopes</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Chart.js via CDN (no npm required) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- jsPDF for PDF Export via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <div class="header-brand">
+                <img id="app-logo" src="./public/assets/itm_logo_claim_white_rgb_high-res.png" alt="ITM" class="logo"
+                    style="height: 40px;">
+            </div>
+            <div class="header-center" style="flex: 1; text-align: center;">
+                <h1 class="header-title">Thermal NAA Tool</h1>
+                <p class="header-subtitle" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
+                    Powered by ITM Medical Isotopes GmbH</p>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 8px;">
+                <button id="btn-theme-toggle" class="btn-secondary btn-theme-toggle" style="width: auto;"
+                    title="Toggle Light/Dark Mode">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-label">Dark</span>
+                </button>
+                <button id="btn-open-manual" class="btn-secondary"
+                    style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
+                    <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    QUICK GUIDE
+                </button>
+            </div>
+        </header>
+
+        <!-- Global Manual Modal -->
+        <div id="manual-modal" class="manual-overlay">
+            <button id="btn-close-manual" class="btn-close-manual">&times;</button>
+            <div class="manual-card">
+                <h2>NuclearX Operating Manual</h2>
+                <div style="color: var(--text-secondary); line-height: 1.8;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3
+                            style="color: white; border-bottom: 1px solid var(--border-highlight); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                            1. General Workflow</h3>
+                        <p>All calculators follow a Three-Step process:</p>
+                        <ol style="padding-left: 1.5rem;">
+                            <li><b>Data Input:</b> Enter your target isotopes or elements and concentration (ppm).</li>
+                            <li><b>Physics Context:</b> Define reactor conditions (Flux, Irradiation, Cooling).</li>
+                            <li><b>Execution:</b> High-performance solvers process the Bateman chains to yield Bq/g and
+                                regulatory indexes.</li>
+                        </ol>
+                    </div>
+
+                    <div style="margin-bottom: 2rem;">
+                        <h3
+                            style="color: white; border-bottom: 1px solid var(--border-highlight); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                            2. Core Symbols</h3>
+                        <p><b>Flux (n/cm²·s):</b> Use scientific notation (e.g., 2.2e14) for high precision.</p>
+                        <p><b>Clearance index:</b> A value where 1.0 is the legal limit. Anything above 1.0 requires
+                            cooling.</p>
+                    </div>
+
+                    <div style="margin-bottom: 2rem;">
+                        <h3
+                            style="color: white; border-bottom: 1px solid var(--border-highlight); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                            3. Exporting & Results</h3>
+                        <p>Results are automatically updated in real-time charts. Use the Export button to save reports.
+                        </p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('manual-modal').classList.remove('active')"
+                    class="btn-primary">Got it!</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs" role="tablist">
+            <button class="nav-tab active" data-tab="single-isotope">
+                <span class="tab-label">Single Isotope Activation</span>
+            </button>
+            <button class="nav-tab" data-tab="impurity">
+                <span class="tab-label">Impurity Activation</span>
+            </button>
+            <button class="nav-tab" data-tab="waste">
+                <span class="tab-label">Waste Compliance</span>
+            </button>
+            <button class="nav-tab" data-tab="limits">
+                <span class="tab-label">Limit ppm</span>
+            </button>
+            <button class="nav-tab" data-tab="results">
+                <span class="tab-label">Results</span>
+            </button>
+        </nav>
+
+        <!-- Content -->
+        <main class="main-content">
+            <section id="tab-single-isotope" class="tab-panel active">
+                <div class="panel card">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Nuclear Intelligence Engine</h2>
+                    </div>
+                    <div class="form-section">
+                        <p class="helper-text">Architecture initialized. Awaiting Math Engineer modules.</p>
+                        <div id="app-status"
+                            style="padding: 1rem; background: rgba(0,212,255,0.05); border-radius: 8px; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); font-family: 'JetBrains Mono';">
+                            System: Online [Vanilla Ed.]
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Other panels hidden for now -->
+            <section id="tab-impurity" class="tab-panel"></section>
+            <section id="tab-waste" class="tab-panel"></section>
+            <section id="tab-limits" class="tab-panel"></section>
+            <section id="tab-results" class="tab-panel"></section>
+        </main>
+
+        <!-- Loading & Toasts -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Optimizing Physics Calculations...</p>
+            </div>
+        </div>
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Theme Toggle Script (loads early to prevent flash) -->
+    <script>
+        (function () {
+            const THEME_KEY = 'nuclear-app-theme';
+            const LIGHT_LOGO = './public/assets/ITM_Logo_Claim_RGB_high-res.png';
+            const DARK_LOGO = './public/assets/itm_logo_claim_white_rgb_high-res.png';
+
+            // Determine initial theme
+            function getInitialTheme() {
+                const stored = localStorage.getItem(THEME_KEY);
+                if (stored) return stored;
+                // Respect system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    return 'light';
+                }
+                return 'dark';
+            }
+
+            // Apply theme to document
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem(THEME_KEY, theme);
+
+                // Update toggle button UI
+                const toggleBtn = document.getElementById('btn-theme-toggle');
+                const logo = document.getElementById('app-logo');
+
+                if (toggleBtn) {
+                    const icon = toggleBtn.querySelector('.theme-icon');
+                    const label = toggleBtn.querySelector('.theme-label');
+                    if (theme === 'light') {
+                        icon.textContent = '☀️';
+                        label.textContent = 'Light';
+                    } else {
+                        icon.textContent = '🌙';
+                        label.textContent = 'Dark';
+                    }
+                }
+
+                if (logo) {
+                    logo.src = theme === 'light' ? LIGHT_LOGO : DARK_LOGO;
+                }
+            }
+
+            // Toggle theme
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                const next = current === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+            }
+
+            // Apply initial theme immediately (before DOM loads)
+            const initialTheme = getInitialTheme();
+            document.documentElement.setAttribute('data-theme', initialTheme);
+
+            // Set up toggle button after DOM loads
+            document.addEventListener('DOMContentLoaded', function () {
+                applyTheme(initialTheme);
+
+                const toggleBtn = document.getElementById('btn-theme-toggle');
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', toggleTheme);
+                }
+
+                // Listen for system theme changes
+                if (window.matchMedia) {
+                    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function (e) {
+                        if (!localStorage.getItem(THEME_KEY)) {
+                            applyTheme(e.matches ? 'light' : 'dark');
+                        }
+                    });
+                }
+            });
+        })();
+    </script>
+
+    <!-- Application Entry Point (ES Module) -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

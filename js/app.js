@@ -24,6 +24,7 @@ class App {
     async init() {
         try {
             // Security Check
+            console.log('App: Initializing PasswordGate...');
             const isAuthenticated = await PasswordGate.init();
             if (!isAuthenticated) return;
 

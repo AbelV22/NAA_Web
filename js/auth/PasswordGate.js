@@ -286,15 +286,21 @@ const PasswordGate = {
      * Returns a Promise that resolves to true when authenticated
      */
     init() {
+        console.log('PasswordGate: init called');
         return new Promise((resolve) => {
             if (this.isAuthenticated()) {
+                console.log('PasswordGate: Already authenticated');
                 resolve(true);
             } else {
+                console.log('PasswordGate: Showing login screen');
                 this.showLoginScreen(resolve);
             }
         });
     }
 };
+
+// Explicitly attach to window to ensure availability in bundle
+window.PasswordGate = PasswordGate;
 
 // Export for use in app.js
 export { PasswordGate };

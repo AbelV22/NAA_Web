@@ -152,14 +152,24 @@ class App {
     }
 
     setupAutocomplete() {
-        const list = document.createElement('datalist');
-        list.id = 'elements-list';
-        PERIODIC_TABLE.forEach(elem => {
-            const opt = document.createElement('option');
-            opt.value = elem;
-            list.appendChild(opt);
+        // Initialize Autocomplete for all relevant inputs
+        new Autocomplete('input-iso', (val) => {
+            console.log('Selected:', val);
+            // Optional: Auto-trigger calculation? Better not, let user confirm parameters.
         });
-        document.body.appendChild(list);
+
+        // Impurity inputs expect Elements (e.g. Fe, Co)
+        new Autocomplete('imp-sym', (val) => {
+            document.getElementById('imp-ppm')?.focus();
+        }, { filterType: 'element' });
+
+        new Autocomplete('waste-imp-sym', (val) => {
+            document.getElementById('waste-imp-ppm')?.focus();
+        }, { filterType: 'element' });
+
+        new Autocomplete('lim-sym', (val) => {
+            document.getElementById('lim-frac')?.focus();
+        }, { filterType: 'element' });
     }
 
     setupEventListeners() {

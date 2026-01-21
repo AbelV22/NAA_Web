@@ -3682,7 +3682,7 @@ class App {
             }
             if (e.target.closest('.btn-load-preset')) {
                 const type = e.target.closest('.btn-load-preset').dataset.type;
-                this.handleLoadPreset(type);
+                this.handleManagePresets(type);
             }
             // End Presets Logic
         });
@@ -3764,45 +3764,172 @@ class App {
     }
 
     handleSavePreset(type) {
-        let data = null;
-        if (type === 'single') data = this.getSingleIsotopeData();
-        if (type === 'impurity') data = this.getImpurityData();
-        if (type === 'waste') data = this.getWasteData();
-        if (type === 'limit') data = this.getLimitData();
+        this.showPresetModal('save', type);
+    }
 
-        if (!data) return;
+    handleManagePresets(type) {
+        this.showPresetModal('manage', type);
+    }
 
-        const name = prompt('Enter a name for this preset:');
-        if (name) {
-            Presets.save(type, name, data);
-            this.showToast('Preset saved!', 'success');
+    showPresetModal(mode, type) {
+        // Remove any existing modal
+        const existing = document.getElementById('preset-modal');
+        if (existing) existing.remove();
+
+        const typeLabels = {
+            single: 'Single Isotope',
+            impurity: 'Impurity',
+            waste: 'Waste Compliance',
+            limit: 'Limit ppm'
+        };
+
+        const modal = document.createElement('div');
+        modal.id = 'preset-modal';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 25, 0.9); z-index: 99998;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
+        `;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cssText = `
+            padding: 1.5rem; width: 380px; max-height: 80vh; overflow-y: auto;
+            border: 1px solid var(--primary-color); background: var(--bg-card);
+        `;
+
+        if (mode === 'save') {
+            card.innerHTML = `
+                <h3 style="margin-top:0; margin-bottom:1rem; color: var(--primary-color);">
+                    💾 Save Preset - ${typeLabels[type]}
+                </h3>
+                <input type="text" id="preset-name-input" placeholder="Enter preset name..." 
+                    class="input-field" style="width:100%; margin-bottom:1rem;">
+                <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                    <button id="preset-cancel-btn" class="btn-secondary">Cancel</button>
+                    <button id="preset-save-btn" class="btn-primary">Save</button>
+                </div>
+            `;
+        } else {
+            // Manage mode - show list with load/delete
+            const presets = Presets.getList(type);
+            const allData = Presets.getAll();
+
+            let listHTML = '';
+            if (presets.length === 0) {
+                listHTML = '<p style="color: var(--text-muted); text-align:center; padding:1rem;">No presets saved yet.</p>';
+            } else {
+                presets.forEach(name => {
+                    const preset = allData[type][name];
+                    const date = new Date(preset.timestamp).toLocaleDateString();
+                    listHTML += `
+                        <div class="preset-item" style="
+                            display:flex; justify-content:space-between; align-items:center;
+                            padding:0.75rem; margin-bottom:0.5rem; 
+                            background:rgba(255,255,255,0.05); border-radius:6px;
+                        ">
+                            <div>
+                                <span style="font-weight:500; color:var(--text-primary);">${name}</span>
+                                <span style="font-size:0.8em; color:var(--text-muted); margin-left:0.5rem;">${date}</span>
+                            </div>
+                            <div style="display:flex; gap:0.5rem;">
+                                <button class="btn-secondary preset-load-btn" data-name="${name}" style="padding:4px 8px; font-size:0.85em;">Load</button>
+                                <button class="btn-secondary preset-delete-btn" data-name="${name}" style="padding:4px 8px; font-size:0.85em; color:#ff6b6b; border-color:#ff6b6b;">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            card.innerHTML = `
+                <h3 style="margin-top:0; margin-bottom:1rem; color: var(--primary-color);">
+                    📂 Manage Presets - ${typeLabels[type]}
+                </h3>
+                <div id="preset-list">${listHTML}</div>
+                <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+                    <button id="preset-cancel-btn" class="btn-secondary">Close</button>
+                </div>
+            `;
+        }
+
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+
+        // Focus input if save mode
+        if (mode === 'save') {
+            setTimeout(() => document.getElementById('preset-name-input').focus(), 50);
+        }
+
+        // Event handlers
+        modal.addEventListener('click', (e) => {
+            const target = e.target;
+
+            // Cancel/Close
+            if (target.id === 'preset-cancel-btn' || target === modal) {
+                modal.remove();
+            }
+
+            // Save
+            if (target.id === 'preset-save-btn') {
+                const nameInput = document.getElementById('preset-name-input');
+                const name = nameInput.value.trim();
+                if (name) {
+                    let data = null;
+                    if (type === 'single') data = this.getSingleIsotopeData();
+                    if (type === 'impurity') data = this.getImpurityData();
+                    if (type === 'waste') data = this.getWasteData();
+                    if (type === 'limit') data = this.getLimitData();
+
+                    Presets.save(type, name, data);
+                    this.showToast(`Preset "${name}" saved!`, 'success');
+                    modal.remove();
+                } else {
+                    nameInput.style.borderColor = '#ff6b6b';
+                    nameInput.placeholder = 'Name is required!';
+                }
+            }
+
+            // Load
+            if (target.classList.contains('preset-load-btn')) {
+                const name = target.dataset.name;
+                const data = Presets.load(type, name);
+
+                if (type === 'single') this.setSingleIsotopeData(data);
+                if (type === 'impurity') this.setImpurityData(data);
+                if (type === 'waste') this.setWasteData(data);
+                if (type === 'limit') this.setLimitData(data);
+
+                this.showToast(`Loaded "${name}"`, 'success');
+                modal.remove();
+            }
+
+            // Delete
+            if (target.classList.contains('preset-delete-btn')) {
+                const name = target.dataset.name;
+                if (confirm(`Delete preset "${name}"?`)) {
+                    Presets.delete(type, name);
+                    target.closest('.preset-item').remove();
+                    this.showToast(`Deleted "${name}"`, 'info');
+
+                    // If no presets left, show message
+                    const remaining = document.querySelectorAll('#preset-list .preset-item');
+                    if (remaining.length === 0) {
+                        document.getElementById('preset-list').innerHTML =
+                            '<p style="color: var(--text-muted); text-align:center; padding:1rem;">No presets saved yet.</p>';
+                    }
+                }
+            }
+        });
+
+        // Enter key to save
+        if (mode === 'save') {
+            document.getElementById('preset-name-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') document.getElementById('preset-save-btn').click();
+            });
         }
     }
 
-    handleLoadPreset(type) {
-        const list = Presets.getList(type);
-        if (list.length === 0) return this.showToast('No presets found', 'warning');
-
-        // Simple prompt for now, could be a better modal later
-        let msg = "Available Presets:\n";
-        list.forEach((n, i) => msg += `${i + 1}. ${n}\n`);
-        msg += "\nEnter the number of the preset to load:";
-
-        const choice = prompt(msg);
-        const idx = parseInt(choice) - 1;
-
-        if (idx >= 0 && idx < list.length) {
-            const name = list[idx];
-            const data = Presets.load(type, name);
-
-            if (type === 'single') this.setSingleIsotopeData(data);
-            if (type === 'impurity') this.setImpurityData(data);
-            if (type === 'waste') this.setWasteData(data);
-            if (type === 'limit') this.setLimitData(data);
-
-            this.showToast(`Loaded "${name}"`, 'success');
-        }
-    }
 
     renderSingleIsotopeForm() {
         const container = document.getElementById('tab-single-isotope');

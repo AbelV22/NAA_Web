@@ -526,6 +526,7 @@ export class NuclearSolver {
                     IsoMaxPPM: isoMaxPPM,
                     Share: share,
                     LimitIso: limitIso,
+                    LimitVal: c.limit,
                     ElemMaxPPM: elemMaxPPM,
                     WastePct: Math.round(f_waste * 100),
                     FracPct: Math.round(f_elem * 100)

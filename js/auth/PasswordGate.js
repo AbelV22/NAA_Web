@@ -1,18 +1,30 @@
 /**
  * PasswordGate.js
- * Simple client-side password protection.
+ * Simple client-side password protection with dual user roles.
+ * - Basic users (itm22View): Can only select isotopes
+ * - Admin users (itm22Fisica): Full access to all parameters
  */
+import { UserRoles } from '../store/UserRoles.js';
+
 export class PasswordGate {
     static async init() {
         const SESSION_KEY = 'naa_auth_session';
-        const REQUIRED_PASS = 'itm22Fisica';
+        const ROLE_KEY = 'naa_user_role';
+
+        // Password configuration
+        const PASSWORDS = {
+            'itm22Fisica': 'admin',  // Full access
+            'itm22View': 'basic'     // View/select isotopes only
+        };
 
         console.log('PasswordGate: Starting initialization');
 
+        // Check existing session
         try {
-            if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-                console.log('PasswordGate: Session valid');
-                return true;
+            const existingRole = sessionStorage.getItem(ROLE_KEY);
+            if (existingRole && sessionStorage.getItem(SESSION_KEY) === 'true') {
+                console.log(`PasswordGate: Session valid (role: ${existingRole})`);
+                return { authenticated: true, role: existingRole };
             }
         } catch (e) {
             console.warn('PasswordGate: SessionStorage inaccessible', e);
@@ -54,10 +66,21 @@ export class PasswordGate {
             const errorMsg = modal.querySelector('#gate-error');
 
             const checkPass = () => {
-                if (input.value === REQUIRED_PASS) {
-                    sessionStorage.setItem(SESSION_KEY, 'true');
+                const enteredPass = input.value;
+                const role = PASSWORDS[enteredPass];
+
+                if (role) {
+                    // Valid password - store session and role
+                    try {
+                        sessionStorage.setItem(SESSION_KEY, 'true');
+                        sessionStorage.setItem(ROLE_KEY, role);
+                        UserRoles.setRole(role);
+                    } catch (e) {
+                        console.warn('PasswordGate: Could not persist session');
+                    }
+
                     modal.remove();
-                    resolve(true);
+                    resolve({ authenticated: true, role: role });
                 } else {
                     errorMsg.textContent = 'Incorrect password';
                     input.value = '';

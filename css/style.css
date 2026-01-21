@@ -683,3 +683,229 @@ body::before {
 .btn-close-manual:hover {
     color: var(--accent-red);
 }
+
+/* --- AUTOCOMPLETE --- */
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-highlight);
+    border-radius: 0 0 8px 8px;
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    margin-top: 4px;
+}
+
+.autocomplete-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: background 0.15s, color 0.15s;
+    font-size: 0.9rem;
+    border-left: 2px solid transparent;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-left-color: var(--accent-primary);
+}
+
+.ac-icon {
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+.ac-label {
+    flex: 1;
+    font-family: var(--font-mono);
+}
+
+.ac-category {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* --- PERIODIC TABLE MODAL --- */
+.pt-grid {
+    display: grid;
+    grid-template-columns: repeat(18, 1fr);
+    gap: 4px;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.pt-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.03);
+    min-width: 36px;
+}
+
+.pt-cell:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-color: white;
+}
+
+.pt-num {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    align-self: flex-start;
+    padding-left: 2px;
+}
+
+.pt-sym {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.pt-name {
+    font-size: 0.5rem;
+    color: var(--text-secondary);
+    display: none;
+    /* Hide on small cells */
+}
+
+@media (min-width: 800px) {
+    .pt-name {
+        display: block;
+    }
+
+    .pt-cell {
+        min-width: 44px;
+    }
+}
+
+/* Categories Colors */
+.alkali-metal {
+    background: rgba(255, 0, 0, 0.15);
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+.alkaline-earth {
+    background: rgba(255, 165, 0, 0.15);
+    border-color: rgba(255, 165, 0, 0.3);
+}
+
+.transition-metal {
+    background: rgba(255, 255, 0, 0.1);
+    border-color: rgba(255, 255, 0, 0.3);
+}
+
+.post-transition {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: rgba(0, 255, 0, 0.3);
+}
+
+.metalloid {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.3);
+}
+
+.nonmetal {
+    background: rgba(0, 0, 255, 0.15);
+    border-color: rgba(0, 0, 255, 0.3);
+}
+
+.noble-gas {
+    background: rgba(128, 0, 128, 0.15);
+    border-color: rgba(128, 0, 128, 0.3);
+}
+
+.lanthanide {
+    background: rgba(255, 192, 203, 0.15);
+    border-color: rgba(255, 192, 203, 0.3);
+}
+
+.actinide {
+    background: rgba(255, 20, 147, 0.15);
+    border-color: rgba(255, 20, 147, 0.3);
+}
+
+.pt-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.pt-legend-item {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+}
+
+/* ==========================================================================
+   ROLE-BASED ACCESS RESTRICTIONS
+   ========================================================================== */
+
+/* Restricted input fields (Basic user) */
+.input-restricted {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(100, 116, 139, 0.1) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+.input-restricted:focus {
+    box-shadow: none !important;
+    border-color: var(--border-subtle) !important;
+}
+
+/* Restricted buttons (Basic user) */
+.btn-restricted {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Role indicator badge */
+.role-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .input-restricted {
+    background: rgba(148, 163, 184, 0.15) !important;
+}
+
+[data-theme="light"] .role-indicator {
+    background: rgba(0, 0, 0, 0.05);
+}

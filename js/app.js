@@ -14,6 +14,8 @@ import { renderActivityPieChart, renderComplianceBarChart, renderDecayChart } fr
 import { exportToPDF } from './utils/PDF.js';
 import { PasswordGate } from './auth/PasswordGate.js';
 import { Presets } from './store/Presets.js';
+import { UserRoles } from './store/UserRoles.js';
+import { searchModule } from './utils/SearchModule.js';
 
 class App {
     constructor() {
@@ -24,11 +26,12 @@ class App {
 
     async init() {
         try {
-            // Security Check
-            const isAuthenticated = await PasswordGate.init();
-            if (!isAuthenticated) return;
+            // Security Check with Role Support
+            const authResult = await PasswordGate.init();
+            if (!authResult || !authResult.authenticated) return;
 
-            console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
+            const userRole = authResult.role;
+            console.log(`%c Thermal NAA Tool Initializing (Role: ${userRole}) `, 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 
             // Initialize UI
             this.setupNavigation();
@@ -39,12 +42,19 @@ class App {
             this.renderLimitForm();
             this.setupEventListeners();
 
+            // Apply role-based restrictions and show role indicator
+            this.applyRoleRestrictions();
+            this.renderRoleIndicator();
+
             this.dataLoader.loadAll()
                 .then(() => {
                     const state = appStore.getState();
                     if (state.dataLoaded) {
                         this.solver = new NuclearSolver(state.xsData, state.chainData, state.limitsData);
-                        console.log('Math Engine Initialized');
+                        // Initialize Search Module with Isotope Data
+                        const isotopeList = this.extractIsotopesFromData(state.xsData);
+                        searchModule.loadIsotopes(isotopeList);
+                        console.log('Math Engine & Search Module Initialized');
                     }
                     console.log('App ready');
                     // Hide any initial loading spinner if applicable
@@ -69,6 +79,57 @@ class App {
             <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem; width:100%;">Retry / Refresh</button>
         `;
         document.body.appendChild(modal);
+    }
+
+    /**
+     * Apply role-based restrictions to form inputs.
+     * Basic users can only edit isotope selection inputs.
+     */
+    applyRoleRestrictions() {
+        UserRoles.applyRestrictions();
+        console.log(`UserRoles: Applied restrictions for role "${UserRoles.getCurrentRole()}"`);
+    }
+
+    /**
+     * Add a visual indicator showing the current user role in the header.
+     */
+    renderRoleIndicator() {
+        const role = UserRoles.getCurrentRole();
+        const displayName = UserRoles.getRoleDisplayName();
+
+        // Find header actions area
+        const headerActions = document.querySelector('.header-actions');
+        if (!headerActions) return;
+
+        // Remove existing indicator
+        const existing = document.getElementById('role-indicator');
+        if (existing) existing.remove();
+
+        // Create role badge
+        const badge = document.createElement('div');
+        badge.id = 'role-indicator';
+        badge.className = 'role-indicator';
+        badge.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            ${role === 'admin'
+                ? 'background: linear-gradient(135deg, #00d4ff, #0099cc); color: #000;'
+                : 'background: rgba(255,255,255,0.1); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.2);'}
+        `;
+        badge.innerHTML = `
+            <span style="font-size: 0.9em;">${role === 'admin' ? '👑' : '👁️'}</span>
+            <span>${displayName}</span>
+        `;
+
+        // Insert at beginning of header actions
+        headerActions.insertBefore(badge, headerActions.firstChild);
     }
 
     setupNavigation() {
@@ -585,9 +646,22 @@ class App {
                     </div>
                     <div id="waste-imp-list" class="impurity-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
                 </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Limit Standard</label>
+                    <select id="waste-limit-type" class="input-field">
+                        <option value="clearance">Unrestricted Clearance (Column 3 - Anlage)</option>
+                        <option value="exemption">Specific Clearance (Column 9 - Anlage)</option>
+                    </select>
+                </div>
                 <button id="btn-calc-waste" class="btn-primary">Analyze Batch</button>
                 <div id="waste-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
+
+        // Add auto-calc listener
+        setTimeout(() => {
+            const dp = document.getElementById('waste-limit-type');
+            if (dp) dp.addEventListener('change', () => this.handleWasteCalculation());
+        }, 100);
     }
 
     renderLimitForm() {
@@ -662,14 +736,20 @@ class App {
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <label>Limit Standard</label>
                     <select id="lim-type" class="input-field">
-                        <option value="clearance">Clearance (Freigabe)</option>
-                        <option value="exemption">Exemption (Befreiung)</option>
+                        <option value="clearance">Unrestricted Clearance (Column 3 - Anlage)</option>
+                        <option value="exemption">Specific Clearance (Column 9 - Anlage)</option>
                     </select>
                 </div>
 
                 <button id="btn-calc-lim" class="btn-primary">Calculate Max ppm</button>
                 <div id="lim-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
+
+        // Add auto-calc listener
+        setTimeout(() => {
+            const dp = document.getElementById('lim-type');
+            if (dp) dp.addEventListener('change', () => this.handleLimitCalculation());
+        }, 100);
     }
 
     handleCalculation() {
@@ -805,12 +885,9 @@ class App {
         this.showToast('Analyzing Batch...', 'info');
 
         try {
-            // Call Engine
-            // Assuming "H" as dummy main element or null, using 'exemption' for now based on logic2.py logic for incineration/dumping?
-            // "Limit_Incineration_100t_Bq_g" was hinted in logic2.py, but usually we use 'clearance' or 'exemption'.
-            // Let's default to 'exemption' as a safer "waste" limit, but ideally UI should allow selection.
-            // For now, hardcode 'exemption' to match typical waste compliance checks.
-            const limitType = 'exemption';
+            // Get limit type from dropdown
+            const limitTypeSelect = document.getElementById('waste-limit-type');
+            const limitType = limitTypeSelect ? limitTypeSelect.value : 'exemption';
 
             const results = this.solver.calculateWasteCompliance(
                 impurities, null, mass, flux, tIrrS, tCoolS, totalWaste, limitType
@@ -977,6 +1054,7 @@ class App {
                             <th>Parent Iso</th>
                             <th>Reaction</th>
                             <th>Isotope</th>
+                            <th>Limit (Bq/g)</th>
                             <th>Iso Max ppm</th>
                             <th>Share %</th>
                             <th>Limit Iso</th>
@@ -997,6 +1075,7 @@ class App {
                         <td>${r.Parent}</td>
                         <td style="font-size: 0.85em; color: var(--text-muted);">${r.Reaction}</td>
                         <td>${r.Isotope}</td>
+                        <td style="font-family: var(--font-mono);">${r.LimitVal.toExponential(2)}</td>
                         <td style="font-family: var(--font-mono);">${isoPpm}</td>
                         <td>${r.Share.toFixed(1)}</td>
                         <td>${r.LimitIso}</td>
@@ -1154,6 +1233,32 @@ class App {
         }, 50);
     }
 
+    extractIsotopesFromData(xsData) {
+        if (!xsData) return [];
+
+        const values = (xsData instanceof Map) ? Array.from(xsData.values()) : xsData;
+        const unique = new Map();
+
+        values.forEach(item => {
+            // Data structure check: simple parser or complex map
+            const sym = item.Symbol || item.Element;
+            const A = item.A || item.Mass_Number;
+            const key = `${sym}-${A}`;
+
+            if (sym && A && !unique.has(key)) {
+                unique.set(key, {
+                    symbol: sym,
+                    A: parseInt(A),
+                    abundance: parseFloat(item.Abundance || 0),
+                    // Keep track if it's a parent (Abundance > 0)
+                    isStable: (parseFloat(item.Abundance || 0) > 0)
+                });
+            }
+        });
+
+        return Array.from(unique.values());
+    }
+
     showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -1162,6 +1267,31 @@ class App {
         toast.textContent = msg;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
+    }
+
+    applyRoleRestrictions() {
+        UserRoles.applyRestrictions();
+    }
+
+    renderRoleIndicator() {
+        const role = UserRoles.getCurrentRole();
+        const header = document.querySelector('.header-actions');
+        if (!header || !role) return;
+
+        // Remove existing indicator if present
+        const existing = header.querySelector('.role-indicator');
+        if (existing) existing.remove();
+
+        const roleLabel = document.createElement('div');
+        roleLabel.className = 'role-indicator';
+        roleLabel.style.cssText = `
+            padding: 4px 12px; border-radius: 4px; font-size: 0.75rem; display: flex; align-items: center;
+            background: ${role === 'admin' ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 200, 0, 0.2)'};
+            color: ${role === 'admin' ? 'var(--accent-cyan)' : '#ffc800'};
+            border: 1px solid ${role === 'admin' ? 'var(--accent-cyan)' : '#ffc800'};
+        `;
+        roleLabel.textContent = UserRoles.getRoleDisplayName();
+        header.insertBefore(roleLabel, header.firstChild);
     }
 }
 

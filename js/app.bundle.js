@@ -1802,175 +1802,775 @@ Kr-86,Kr-87,4.58e+03 s,β-,100.00%,1,Rb-87,1.57e+18 s,4.42E-19,BD_Local,BD_Local
 Eu-151,Eu-152m,3.35e+04 s,β-,73.00%,0.73,Gd-152,1.08E14 y,2.03E-22,,
 `,
     limits: `Isotope,Limit_Clearance_Bq_g,Limit_Exemption_Bq_g
-H-3,1.00E+06,1.00E+06
-Be-10,1.00E+04,1.00E+04
-C-14,1.00E+04,1.00E+04
-Na-22,1.00E+01,1.00E+01
-Na-24,1.00E+01,1.00E+01
-Al-26,1.00E+01,1.00E+01
-Si-32,1.00E+03,1.00E+03
-P-32,1.00E+03,1.00E+03
-P-33,1.00E+05,1.00E+05
-S-35,1.00E+05,1.00E+05
-Cl-36,1.00E+04,1.00E+04
-Ar-37,1.00E+06,1.00E+06
-Ar-39,1.00E+07,1.00E+04
-Ar-41,1.00E+02,1.00E+02
-K-40,1.00E+02,1.00E+02
-K-42,1.00E+02,1.00E+02
-Ca-41,1.00E+05,1.00E+05
-Ca-45,1.00E+04,1.00E+04
-Ca-47,1.00E+01,1.00E+01
-Sc-46,1.00E+01,1.00E+01
-Sc-47,1.00E+02,1.00E+02
-Ti-44,1.00E+01,1.00E+01
-V-48,1.00E+01,1.00E+01
-V-49,1.00E+04,1.00E+04
-Cr-51,1.00E+03,1.00E+03
-Mn-52,1.00E+01,1.00E+01
-Mn-53,1.00E+04,1.00E+04
-Mn-54,1.00E+01,1.00E+01
-Mn-56,1.00E+01,1.00E+01
-Fe-55,1.00E+04,1.00E+04
-Fe-59,1.00E+01,1.00E+01
-Fe-60,1.00E+02,1.00E+02
-Co-56,1.00E+01,1.00E+01
-Co-57,1.00E+02,1.00E+02
-Co-58,1.00E+01,1.00E+01
-Co-60,1.00E+01,1.00E+01
-Ni-59,1.00E+04,1.00E+04
-Ni-63,1.00E+05,1.00E+05
-Ni-65,1.00E+01,1.00E+01
-Cu-64,1.00E+02,1.00E+02
-Zn-65,1.00E+01,1.00E+01
-Zn-69,1.00E+04,1.00E+04
-Ga-72,1.00E+01,1.00E+01
-Ge-71,1.00E+04,1.00E+04
-As-73,1.00E+03,1.00E+03
-As-74,1.00E+01,1.00E+01
-As-76,1.00E+02,1.00E+02
-As-77,1.00E+03,1.00E+03
-Se-75,1.00E+02,1.00E+02
-Se-79,1.00E+04,1.00E+04
-Br-82,1.00E+01,1.00E+01
-Kr-81,1.00E+04,1.00E+04
-Kr-85,1.00E+05,1.00E+04
-Rb-86,1.00E+02,1.00E+02
-Rb-87,1.00E+04,1.00E+04
-Sr-85,1.00E+02,1.00E+02
-Sr-89,1.00E+03,1.00E+03
-Sr-90,1.00E+02,1.00E+02
-Y-88,1.00E+01,1.00E+01
-Y-90,1.00E+03,1.00E+03
-Y-91,1.00E+03,1.00E+03
-Zr-93,1.00E+03,1.00E+03
-Zr-95,1.00E+01,1.00E+01
-Nb-93m,1.00E+04,1.00E+04
-Nb-94,1.00E+01,1.00E+01
-Nb-95,1.00E+01,1.00E+01
-Mo-93,1.00E+03,1.00E+03
-Mo-99,1.00E+02,1.00E+02
-Tc-97,1.00E+03,1.00E+03
-Tc-99,1.00E+04,1.00E+04
-Tc-99m,1.00E+02,1.00E+02
-Ru-103,1.00E+02,1.00E+02
-Ru-106,1.00E+02,1.00E+02
-Rh-105,1.00E+02,1.00E+02
-Pd-103,1.00E+03,1.00E+03
-Pd-107,1.00E+05,1.00E+05
-Ag-105,1.00E+02,1.00E+02
-Ag-108,1.00E+01,1.00E+01
-Ag-110,1.00E+01,1.00E+01
-Ag-110m,1.00E+01,1.00E+01
-Ag-111,1.00E+03,1.00E+03
-Cd-109,1.00E+04,1.00E+04
-Cd-113,1.00E+03,1.00E+03
-Cd-115,1.00E+02,1.00E+02
-In-111,1.00E+02,1.00E+02
-In-114,1.00E+03,1.00E+03
-In-115m,1.00E+02,1.00E+02
-Sn-113,1.00E+03,1.00E+03
-Sn-119m,1.00E+03,1.00E+03
-Sn-121,1.00E+05,1.00E+05
-Sn-123,1.00E+03,1.00E+03
-Sn-125,1.00E+02,1.00E+02
-Sb-122,1.00E+02,1.00E+02
-Sb-124,1.00E+01,1.00E+01
-Sb-125,1.00E+02,1.00E+02
-Te-123m,1.00E+02,1.00E+02
-Te-125m,1.00E+03,1.00E+03
-Te-127,1.00E+03,1.00E+03
-Te-129,1.00E+02,1.00E+02
-Te-132,1.00E+02,1.00E+02
-I-123,1.00E+02,1.00E+02
-I-125,1.00E+03,1.00E+03
-I-129,1.00E+02,1.00E+02
-I-131,1.00E+02,1.00E+02
-Xe-131m,1.00E+04,1.00E+04
-Xe-133,1.00E+03,1.00E+03
-Cs-134,1.00E+01,1.00E+01
-Cs-135,1.00E+04,1.00E+04
-Cs-137,1.00E+01,1.00E+01
-Ba-131,1.00E+02,1.00E+02
-Ba-133,1.00E+02,1.00E+02
-Ba-140,1.00E+01,1.00E+01
-La-140,1.00E+01,1.00E+01
-Ce-139,1.00E+02,1.00E+02
-Ce-141,1.00E+02,1.00E+02
-Ce-144,1.00E+02,1.00E+02
-Pr-143,1.00E+04,1.00E+04
-Nd-147,1.00E+02,1.00E+02
-Pm-147,1.00E+04,1.00E+04
-Pm-149,1.00E+03,1.00E+03
-Sm-151,1.00E+04,1.00E+04
-Sm-153,1.00E+02,1.00E+02
-Eu-152,1.00E+01,1.00E+01
-Eu-154,1.00E+01,1.00E+01
-Eu-155,1.00E+02,1.00E+02
-Gd-153,1.00E+02,1.00E+02
-Gd-159,1.00E+03,1.00E+03
-Tb-160,1.00E+01,1.00E+01
-Dy-159,1.00E+03,1.00E+03
-Dy-165,1.00E+03,1.00E+03
-Ho-166,1.00E+03,1.00E+03
-Er-169,1.00E+04,1.00E+04
-Er-171,1.00E+02,1.00E+02
-Tm-170,1.00E+03,1.00E+03
-Tm-171,1.00E+04,1.00E+04
-Yb-169,1.00E+02,1.00E+02
-Yb-175,1.00E+03,1.00E+03
-Lu-177,1.00E+03,1.00E+03
-Hf-175,1.00E+02,1.00E+02
-Hf-181,1.00E+01,1.00E+01
-Ta-182,1.00E+01,1.00E+01
-W-181,1.00E+03,1.00E+03
-W-185,1.00E+04,1.00E+04
-W-187,1.00E+02,1.00E+02
-Re-186,1.00E+03,1.00E+03
-Re-188,1.00E+02,1.00E+02
-Os-185,1.00E+01,1.00E+01
-Os-191,1.00E+02,1.00E+02
-Os-193,1.00E+02,1.00E+02
-Ir-192,1.00E+01,1.00E+01
-Ir-194,1.00E+02,1.00E+02
-Pt-191,1.00E+02,1.00E+02
-Pt-193,1.00E+04,1.00E+04
-Pt-197,1.00E+03,1.00E+03
-Au-198,1.00E+02,1.00E+02
-Au-199,1.00E+02,1.00E+02
-Hg-197,1.00E+02,1.00E+02
-Hg-203,1.00E+02,1.00E+02
-Tl-204,1.00E+04,1.00E+04
-Pb-210,1.00E+01,1.00E+01
-Bi-210,1.00E+03,1.00E+03
-Po-210,1.00E+01,1.00E+01
-Ra-226,1.00E+01,1.00E+01
-Th-232,1.00E+01,1.00E+01
-U-235,1.00E+01,1.00E+01
-U-238,1.00E+01,1.00E+01
-Np-237,1.00E+00,1.00E+00
-Pu-239,1.00E+00,1.00E+00
-Am-241,1.00E+00,1.00E+00
+H-3,100.0,100000.0
+Be-7,10.0,400.0
+Be-10,100.0,100.0
+C-11,10.0,10.0
+"C-11Monoxid,Dioxid",10.0,10.0
+C-14,1.0,4000.0
+"C-14Monoxid,Dioxid",1.0,1.0
+N-13,100.0,100.0
+O-15,100.0,100.0
+F-18,10.0,10.0
+Na-22,0.1,9.0
+Na-24,1.0,1.0
+Mg-28+,1.0,1.0
+Al-26,0.01,0.01
+Si-31,1000.0,1000.0
+Si-32+,100.0,1000.0
+P-32,1000.0,1000.0
+P-33,1000.0,100000.0
+S-35,100.0,20000.0
+S-35Gas,100.0,100.0
+Cl-36,1.0,3.0
+Cl-38,10.0,10.0
+Cl-39,10.0,10.0
+Ar-37,1000000.0,1000000.0
+Ar-39,10000000.0,10000000.0
+Ar-41,100.0,100.0
+K-40,1.0,1.0
+K-42,100.0,100.0
+K-43,10.0,10.0
+K-44,10.0,10.0
+K-45,10.0,10.0
+Ca-41,100.0,1000.0
+Ca-45+,100.0,10000.0
+Ca-47,10.0,10.0
+Sc-43,10.0,10.0
+Sc-44,100.0,100.0
+Sc-44m+,1.0,1.0
+Sc-46,0.1,9.0
+Sc-47,100.0,100.0
+Sc-48,1.0,1.0
+Sc-49,1000.0,1000.0
+Ti-44+,0.1,7.0
+Ti-45,10.0,10.0
+V-47,10.0,10.0
+V-48,1.0,7.0
+V-49,10000.0,10000.0
+Cr-48,100.0,100.0
+Cr-49,10.0,10.0
+Cr-51,100.0,900.0
+Mn-51,10.0,10.0
+Mn-52,1.0,1.0
+Mn-52m,10.0,10.0
+Mn-53,100.0,4000.0
+Mn-54,0.1,10.0
+Mn-56,10.0,10.0
+Fe-52+,10.0,10.0
+Fe-55,1000.0,10000.0
+Fe-59,1.0,10.0
+Fe-60+,10.0,10.0
+Co-55,10.0,10.0
+Co-56,0.1,5.0
+Co-57,1.0,100.0
+Co-58,1.0,10.0
+Co-58m,10000.0,10000.0
+Co-60,0.1,7.0
+Co-60m,1000.0,1000.0
+Co-61,100.0,100.0
+Co-62m+,10.0,10.0
+Ni-56,10.0,10.0
+Ni-57,10.0,10.0
+Ni-59,100.0,10000.0
+Ni-63,100.0,60000.0
+Ni-65,10.0,10.0
+Ni-66+,10000.0,10000.0
+Cu-60,10.0,10.0
+Cu-61,10.0,10.0
+Cu-64,100.0,100.0
+Cu-67,100.0,100.0
+Zn-62+,100.0,100.0
+Zn-63,10.0,10.0
+Zn-65,0.1,10.0
+Zn-69,1000.0,1000.0
+Zn-69m+,10.0,10.0
+Zn-71m,10.0,10.0
+Zn-72+,100.0,100.0
+Ga-65,10.0,10.0
+Ga-66,10.0,10.0
+Ga-67,100.0,100.0
+Ga-68,10.0,10.0
+Ga-70,1000.0,1000.0
+Ga-72,10.0,10.0
+Ga-73+,100.0,100.0
+Ge-66,10.0,10.0
+Ge-67,10.0,10.0
+Ge-68+,0.1,10.0
+Ge-69,10.0,10.0
+Ge-71,10000.0,10000.0
+Ge-75,1000.0,1000.0
+Ge-77,10.0,10.0
+Ge-78,100.0,100.0
+As-69,10.0,10.0
+As-70,10.0,10.0
+As-71,10.0,10.0
+As-72,10.0,10.0
+As-73+,1000.0,1000.0
+As-74,10.0,10.0
+As-76,10.0,10.0
+As-77,1000.0,1000.0
+As-78,10.0,10.0
+Se-70,10.0,10.0
+Se-73,10.0,10.0
+Se-73m,100.0,100.0
+Se-75,1.0,70.0
+Se-79,0.1,0.1
+Se-81,1000.0,1000.0
+Se-81m+,1000.0,1000.0
+Se-83,10.0,10.0
+Br-74,10.0,10.0
+Br-74m,10.0,10.0
+Br-75,10.0,10.0
+Br-76,10.0,10.0
+Br-77,100.0,100.0
+Br-80,100.0,100.0
+Br-80m+,1000.0,1000.0
+Br-82,1.0,1.0
+Br-83+,1000.0,1000.0
+Br-84,10.0,10.0
+Kr-74,100.0,100.0
+Kr-76,100.0,100.0
+Kr-77,100.0,100.0
+Kr-79,1000.0,1000.0
+Kr-81,10000.0,10000.0
+Kr-81m,1000.0,1000.0
+Kr-83m,100000.0,100000.0
+Kr-85,100000.0,100000.0
+Kr-85m,1000.0,1000.0
+Kr-87,100.0,100.0
+Kr-88+,100.0,100.0
+Rb-79,10.0,10.0
+Rb-81+,10.0,10.0
+Rb-81m+,1000.0,1000.0
+Rb-82m,10.0,10.0
+Rb-83+,1.0,40.0
+Rb-84,1.0,20.0
+Rb-86,100.0,100.0
+Rb-87,10.0,10.0
+Rb-88,10.0,10.0
+Rb-89,10.0,10.0
+Sr-80+,1000.0,1000.0
+Sr-81,10.0,10.0
+Sr-82+,1.0,1.0
+Sr-83,10.0,10.0
+Sr-85,1.0,40.0
+Sr-85m,100.0,100.0
+Sr-87m,100.0,100.0
+Sr-89+,1000.0,1000.0
+Sr-90+,1.0,40.0
+Sr-91+,10.0,10.0
+Sr-92,10.0,10.0
+Y-86,10.0,10.0
+Y-86m,100.0,100.0
+Y-87+,10.0,10.0
+Y-88,0.1,7.0
+Y-90,1000.0,1000.0
+Y-91,100.0,1000.0
+Y-91m,100.0,100.0
+Y-92,100.0,100.0
+Y-93,100.0,100.0
+Y-94,10.0,10.0
+Y-95,10.0,10.0
+Zr-86+,100.0,100.0
+Zr-88,1.0,1.0
+Zr-89+,10.0,10.0
+Zr-93,10.0,8000.0
+Zr-95+,1.0,10.0
+Zr-97,10.0,10.0
+Zr-97+,10.0,10.0
+Nb-88,10.0,10.0
+Nb-89+,10.0,10.0
+Nb-90+,10.0,10.0
+Nb-91,100.0,100.0
+Nb-91m,10.0,10.0
+Nb-93m,10.0,10000.0
+Nb-94,0.1,10.0
+Nb-95,1.0,10.0
+Nb-97,10.0,10.0
+Nb-98m,10.0,10.0
+Mo-90+,10.0,10.0
+Mo-93,10.0,300.0
+Mo-99+,10.0,10.0
+Mo-101+,10.0,10.0
+Tc-93,10.0,10.0
+Tc-93m,10.0,10.0
+Tc-94,10.0,10.0
+Tc-94m,10.0,10.0
+Tc-95m+,1.0,1.0
+Tc-96,1.0,1.0
+Tc-96m,1000.0,1000.0
+Tc-97,10.0,60.0
+Tc-97m,100.0,1000.0
+Tc-98,0.1,0.1
+Tc-99,1.0,6.0
+Tc-99m,100.0,100.0
+Tc-101,100.0,100.0
+Tc-104,10.0,10.0
+Ru-94,100.0,100.0
+Ru-97,10.0,10.0
+Ru-103+,1.0,50.0
+Ru-105+,10.0,10.0
+Ru-106+,0.1,100.0
+Rh-99,10.0,10.0
+Rh-99m,10.0,10.0
+Rh-100,10.0,10.0
+Rh-101,1.0,100.0
+Rh-101m,100.0,100.0
+Rh-102,0.1,0.1
+Rh-102m,1.0,40.0
+Rh-103m,10000.0,10000.0
+Rh-105,100.0,100.0
+Rh-106m,10.0,10.0
+Rh-107,100.0,100.0
+Pd-100+,100.0,100.0
+Pd-101,100.0,100.0
+Pd-103+,1000.0,1000.0
+Pd-107,1000.0,1000.0
+Pd-109+,100.0,100.0
+Ag-102,10.0,10.0
+Ag-103,10.0,10.0
+Ag-104,10.0,10.0
+Ag-104m,10.0,10.0
+Ag-105,1.0,40.0
+Ag-106,10.0,10.0
+Ag-106m,10.0,10.0
+Ag-108m+,0.1,10.0
+Ag-110m+,0.1,6.0
+Ag-111,100.0,1000.0
+Ag-112,10.0,10.0
+Ag-115,10.0,10.0
+Cd-104+,100.0,100.0
+Cd-107+,1000.0,1000.0
+Cd-109+,1.0,4000.0
+Cd-113,0.1,0.1
+Cd-113m,0.1,800.0
+Cd-115+,10.0,10.0
+Cd-115m+,100.0,700.0
+Cd-117+,10.0,10.0
+Cd-117m+,10.0,10.0
+In-109,10.0,10.0
+In-110m,10.0,10.0
+In-111+,10.0,10.0
+In-112,100.0,100.0
+In-113m,100.0,100.0
+In-114,1000.0,1000.0
+In-114m+,10.0,100.0
+In-115,10.0,10.0
+In-115m,100.0,100.0
+In-116m,10.0,10.0
+In-117,10.0,10.0
+In-117m+,100.0,100.0
+In-119m+,100.0,100.0
+Sn-110+,100.0,100.0
+Sn-111+,100.0,100.0
+Sn-113+,1.0,80.0
+Sn-117m,100.0,100.0
+Sn-119m,10.0,10.0
+Sn-121,100000.0,100000.0
+Sn-121m+,1.0,1.0
+Sn-123,100.0,2000.0
+Sn-123m,100.0,100.0
+Sn-125,10.0,60.0
+Sn-126+,0.1,0.1
+Sn-127,10.0,10.0
+Sn-128+,10.0,10.0
+Sb-115,10.0,10.0
+Sb-116,10.0,10.0
+Sb-116m,10.0,10.0
+Sb-117,100.0,100.0
+Sb-118m,10.0,10.0
+Sb-119,1000.0,1000.0
+Sb-120m,10.0,10.0
+Sb-122,10.0,10.0
+Sb-124,1.0,9.0
+Sb-125+,0.1,40.0
+Sb-126,10.0,10.0
+Sb-126m,10.0,10.0
+Sb-127+,10.0,10.0
+Sb-128m,10.0,10.0
+Sb-129+,10.0,10.0
+Sb-130,10.0,10.0
+Sb-131,10.0,10.0
+Te-116+,100.0,100.0
+Te-121,10.0,10.0
+Te-121m,1.0,1.0
+Te-123,0.1,0.1
+Te-123m,1.0,100.0
+Te-125m,1000.0,1000.0
+Te-127,1000.0,1000.0
+Te-127m+,10.0,1000.0
+Te-129,100.0,100.0
+Te-129m+,10.0,300.0
+Te-131,100.0,100.0
+Te-131m+,10.0,10.0
+Te-132+,1.0,1.0
+Te-133,10.0,10.0
+Te-133m+,10.0,10.0
+Te-134,10.0,10.0
+I-120,10.0,10.0
+I-120m,10.0,10.0
+I-121,100.0,100.0
+I-123,100.0,100.0
+I-124,10.0,10.0
+I-125,100.0,1000.0
+I-126,10.0,50.0
+I-128,100.0,100.0
+I-129,0.01,0.6
+I-130,10.0,10.0
+I-131,10.0,70.0
+I-132,10.0,10.0
+I-132m,100.0,100.0
+I-133,10.0,10.0
+I-134,10.0,10.0
+I-135+,10.0,10.0
+Xe-120,100.0,100.0
+Xe-121,100.0,100.0
+Xe-122+,100.0,100.0
+Xe-123,100.0,100.0
+Xe-125,1000.0,1000.0
+Xe-127,1000.0,1000.0
+Xe-129m,1000.0,1000.0
+Xe-131m,10000.0,10000.0
+Xe-133,1000.0,1000.0
+Xe-133m,1000.0,1000.0
+Xe-135,1000.0,1000.0
+Xe-135m,100.0,100.0
+Xe-138,100.0,100.0
+Cs-125,10.0,10.0
+Cs-127,100.0,100.0
+Cs-129,10.0,10.0
+Cs-130,100.0,100.0
+Cs-131,1000.0,1000.0
+Cs-132,10.0,10.0
+Cs-134,0.1,10.0
+Cs-134m,1000.0,1000.0
+Cs-135,100.0,3000.0
+Cs-136,1.0,9.0
+Cs-137+,0.1,10.0
+Cs-138,10.0,10.0
+Ba-126+,100.0,100.0
+Ba-128+,100.0,100.0
+Ba-131,10.0,60.0
+Ba-131m,100.0,100.0
+Ba-133,0.1,80.0
+Ba-133m,100.0,100.0
+Ba-135m,100.0,100.0
+Ba-137m,10.0,10.0
+Ba-139,100.0,100.0
+Ba-140,1.0,10.0
+Ba-141,10.0,10.0
+Ba-142,10.0,10.0
+La-131,10.0,10.0
+La-132,10.0,10.0
+La-135,1000.0,1000.0
+La-137,100.0,100.0
+La-138,0.1,0.1
+La-140,1.0,1.0
+La-141,100.0,100.0
+La-142,10.0,10.0
+La-143,100.0,100.0
+Ce-134+,1000.0,1000.0
+Ce-135,10.0,10.0
+Ce-137,1000.0,1000.0
+Ce-137m+,1000.0,1000.0
+Ce-139,1.0,100.0
+Ce-141,100.0,100.0
+Ce-143,10.0,10.0
+Ce-144+,10.0,100.0
+Pr-136,10.0,10.0
+Pr-137,100.0,100.0
+Pr-138m,10.0,10.0
+Pr-139+,100.0,100.0
+Pr-142,100.0,100.0
+Pr-142m,10000000.0,10000000.0
+Pr-143,1000.0,10000.0
+Pr-144,100.0,100.0
+Pr-145,1000.0,1000.0
+Pr-147,10.0,10.0
+Nd-136+,100.0,100.0
+Nd-138+,1000.0,1000.0
+Nd-139,100.0,100.0
+Nd-139m+,10.0,10.0
+Nd-140+,10.0,10.0
+Nd-141,100.0,100.0
+Nd-147,100.0,100.0
+Nd-149,100.0,100.0
+Nd-151,10.0,10.0
+Pm-141+,10.0,10.0
+Pm-143,1.0,1.0
+Pm-144,0.1,0.1
+Pm-145,10.0,10.0
+Pm-146,0.1,30.0
+Pm-147,1000.0,10000.0
+Pm-148,10.0,10.0
+Pm-148m,1.0,1.0
+Pm-149,1000.0,1000.0
+Pm-150,10.0,10.0
+Pm-151,100.0,100.0
+Sm-141,10.0,10.0
+Sm-141m+,10.0,10.0
+Sm-142+,100.0,100.0
+Sm-145,10.0,10.0
+Sm-146,1.0,1.0
+Sm-147,1.0,1.0
+Sm-151,1000.0,10000.0
+Sm-153,100.0,100.0
+Sm-155,100.0,100.0
+Sm-156,100.0,100.0
+Eu-145,10.0,10.0
+Eu-146,10.0,10.0
+Eu-147,10.0,10.0
+Eu-148,1.0,1.0
+Eu-149,10.0,10.0
+Eu-150,0.1,0.1
+Eu-152,0.1,10.0
+Eu-152m,100.0,100.0
+Eu-154,0.1,10.0
+Eu-155,1.0,100.0
+Eu-156,10.0,10.0
+Eu-157,100.0,100.0
+Eu-158,10.0,10.0
+Gd-145,10.0,10.0
+Gd-146+,1.0,1.0
+Gd-147,10.0,10.0
+Gd-148,1.0,30.0
+Gd-149,100.0,100.0
+Gd-151,10.0,10.0
+Gd-152,1.0,1.0
+Gd-153,10.0,100.0
+Gd-159,100.0,100.0
+Tb-147,10.0,10.0
+Tb-149,10.0,10.0
+Tb-150,10.0,10.0
+Tb-151,10.0,10.0
+Tb-153,100.0,100.0
+Tb-154,10.0,10.0
+Tb-155,100.0,100.0
+Tb-156,10.0,10.0
+Tb-156n,1000.0,1000.0
+Tb-157,100.0,100.0
+Tb-158,0.1,20.0
+Tb-160,1.0,10.0
+Tb-161,1000.0,1000.0
+Dy-155,10.0,10.0
+Dy-157,100.0,100.0
+Dy-159,100.0,100.0
+Dy-165,1000.0,1000.0
+Dy-166,100.0,100.0
+Ho-155,100.0,100.0
+Ho-157+,100.0,100.0
+Ho-159,100.0,100.0
+Ho-161,100.0,100.0
+Ho-162,100.0,100.0
+Ho-162m+,10.0,10.0
+Ho-164,1000.0,1000.0
+Ho-164m+,1000.0,1000.0
+Ho-166,100.0,100.0
+Ho-166m,0.1,10.0
+Ho-167+,100.0,100.0
+Er-161+,10.0,10.0
+Er-165,1000.0,1000.0
+Er-169,1000.0,10000.0
+Er-171,100.0,100.0
+Er-172,100.0,100.0
+Tm-162,10.0,10.0
+Tm-166,10.0,10.0
+Tm-167+,100.0,100.0
+Tm-170,100.0,1000.0
+Tm-171,1000.0,10000.0
+Tm-172,100.0,100.0
+Tm-173,100.0,100.0
+Tm-175+,10.0,10.0
+Yb-162,100.0,100.0
+Yb-166+,100.0,100.0
+Yb-167,100.0,100.0
+Yb-169,10.0,200.0
+Yb-175,100.0,100.0
+Yb-177,100.0,100.0
+Yb-178+,1000.0,1000.0
+Lu-169+,10.0,10.0
+Lu-170,10.0,10.0
+Lu-171,10.0,10.0
+Lu-172,10.0,10.0
+Lu-173,1.0,1.0
+Lu-174,1.0,1.0
+Lu-174m,10.0,10.0
+Lu-176,0.1,0.1
+Lu-176m,1000.0,1000.0
+Lu-177,100.0,100.0
+Lu-177m+,0.1,30.0
+Lu-178,100.0,100.0
+Lu-178m+,10.0,10.0
+Lu-179,1000.0,1000.0
+Hf-170+,100.0,100.0
+Hf-172+,1.0,1.0
+Hf-173,100.0,100.0
+Hf-175,1.0,80.0
+Hf-177n+,10.0,10.0
+Hf-178n+,0.1,0.1
+Hf-179n,10.0,10.0
+Hf-180m,10.0,10.0
+Hf-181,1.0,10.0
+Hf-182+,0.1,0.1
+Hf-182m+,10.0,10.0
+Hf-183,10.0,10.0
+Hf-184,100.0,100.0
+Ta-172,10.0,10.0
+Ta-173,10.0,10.0
+Ta-174,10.0,10.0
+Ta-175,10.0,10.0
+Ta-176,10.0,10.0
+Ta-177,100.0,100.0
+Ta-178m+,10.0,10.0
+Ta-179,10.0,10.0
+Ta-180,1000.0,1000.0
+Ta-180m,0.1,0.1
+Ta-182,0.1,10.0
+Ta-182n+,100.0,100.0
+Ta-183+,100.0,100.0
+Ta-184,10.0,10.0
+Ta-185,100.0,100.0
+Ta-186,10.0,10.0
+W-176,100.0,100.0
+W-177,10.0,10.0
+W-178+,100.0,100.0
+W-179,100.0,100.0
+W-181,10.0,1000.0
+W-185,1000.0,10000.0
+W-187,10.0,10.0
+W-188+,10.0,100.0
+Re-177,10.0,10.0
+Re-178,10.0,10.0
+Re-181,10.0,10.0
+Re-182,10.0,10.0
+Re-183,10.0,10.0
+Re-184,1.0,20.0
+Re-184m,0.1,0.1
+Re-186,1000.0,1000.0
+Re-186m+,1.0,1.0
+Re-187,1000.0,1000.0
+Re-188,100.0,100.0
+Re-188m,100.0,100.0
+Re-189+,100.0,100.0
+Os-180+,100.0,100.0
+Os-181,10.0,10.0
+Os-182,100.0,100.0
+Os-185,1.0,10.0
+Os-189m,10000.0,10000.0
+Os-191+,100.0,100.0
+Os-191m,1000.0,1000.0
+Os-193,100.0,100.0
+Os-194+,1.0,200.0
+Ir-182,10.0,10.0
+Ir-184,10.0,10.0
+Ir-185,10.0,10.0
+Ir-186,10.0,10.0
+Ir-187,100.0,100.0
+Ir-188,10.0,10.0
+Ir-189+,100.0,100.0
+Ir-190,1.0,8.0
+Ir-192,1.0,10.0
+Ir-192m,1000.0,1000.0
+Ir-193m,10000.0,10000.0
+Ir-194,100.0,100.0
+Ir-194n,0.1,10.0
+Ir-195,100.0,100.0
+Ir-195m+,100.0,100.0
+Pt-186+,10.0,10.0
+Pt-188,10.0,10.0
+Pt-189,100.0,100.0
+Pt-190,1.0,1.0
+Pt-191+,10.0,10.0
+Pt-193,10.0,10.0
+Pt-193m,1000.0,1000.0
+Pt-195m,100.0,100.0
+Pt-197,1000.0,1000.0
+Pt-197m+,100.0,100.0
+Pt-199,100.0,100.0
+Pt-200+,100.0,100.0
+Au-193,100.0,100.0
+Au-194,10.0,10.0
+Au-195,10.0,1000.0
+Au-196,10.0,10.0
+Au-198,10.0,10.0
+Au-198m,10.0,10.0
+Au-199,100.0,100.0
+Au-200,100.0,100.0
+Au-200m+,10.0,10.0
+Au-201,100.0,100.0
+Hg-193+,100.0,100.0
+Hg-193m+,10.0,10.0
+Hg-194+,0.1,0.1
+Hg-195+,100.0,100.0
+Hg-195m+,100.0,100.0
+Hg-197,100.0,100.0
+Hg-197m+,100.0,100.0
+Hg-203,10.0,100.0
+Tl-194,10.0,10.0
+Tl-194m,10.0,10.0
+Tl-195,10.0,10.0
+Tl-197,100.0,100.0
+Tl-198,10.0,10.0
+Tl-198m,10.0,10.0
+Tl-199,100.0,100.0
+Tl-200,10.0,10.0
+Tl-201,100.0,100.0
+Tl-202,10.0,60.0
+Tl-204,1.0,9000.0
+Pb-195m+,10.0,10.0
+Pb-198,100.0,100.0
+Pb-199,10.0,10.0
+Pb-200,100.0,100.0
+Pb-201,10.0,10.0
+Pb-202+,0.1,0.1
+Pb-202m,10.0,10.0
+Pb-203,10.0,10.0
+Pb-205,10.0,10.0
+Pb-209,100000.0,100000.0
+Pb-210+,0.1,80.0
+Pb-211+,100.0,100.0
+Pb-212,10.0,10.0
+Pb-212+,10.0,10.0
+Pb-214+,100.0,100.0
+Bi-200,10.0,10.0
+Bi-201+,10.0,10.0
+Bi-202,10.0,10.0
+Bi-203+,10.0,10.0
+Bi-205+,10.0,10.0
+Bi-206,1.0,1.0
+Bi-207,0.1,10.0
+Bi-208,0.01,0.01
+Bi-210,1000.0,1000.0
+Bi-210m+,0.1,0.1
+Bi-212+,10.0,10.0
+Bi-213+,100.0,100.0
+Bi-214+,10.0,10.0
+Po-203,10.0,10.0
+Po-205,10.0,10.0
+Po-206,10.0,10.0
+Po-207,10.0,10.0
+Po-208,1.0,50.0
+Po-209,1.0,1.0
+Po-210,1.0,10.0
+At-207,10.0,10.0
+At-211+,1000.0,1000.0
+Rn-220+,10000.0,10000.0
+Rn-222+,10.0,10.0
+Fr-222+,1000.0,1000.0
+Fr-223+,100.0,100.0
+Ra-223+,100.0,60.0
+Ra-224+,10.0,10.0
+Ra-225,10.0,90.0
+Ra-226+,0.01,5.0
+Ra-227,100.0,100.0
+Ra-228+,0.1,8.0
+Ac-224+,100.0,100.0
+Ac-225+,10.0,70.0
+Ac-226+,100.0,100.0
+Ac-227+,0.01,0.1
+Ac-228,10.0,10.0
+Th-226+,1000.0,1000.0
+Th-227,10.0,10.0
+Th-228+,0.1,1.0
+Th-229+,0.1,1.0
+Th-230,0.1,1.0
+Th-231,1000.0,1000.0
+Th-232,10.0,5.0
+Th-232+,0.01,1.0
+Th-234+,100.0,1000.0
+Pa-227+,1000.0,1000.0
+Pa-228+,10.0,10.0
+Pa-230+,10.0,10.0
+Pa-231,0.01,1.0
+Pa-232,10.0,10.0
+Pa-233,10.0,100.0
+Pa-234,10.0,10.0
+U-230+,10.0,10.0
+U-231,100.0,100.0
+U-232+,0.1,1.0
+U-233,1.0,10.0
+U-234,1.0,10.0
+U-235+,1.0,4.0
+U-236,10.0,10.0
+U-237,100.0,100.0
+U-238+,1.0,10.0
+U-239,100.0,100.0
+U-240+,100.0,100.0
+Np-232,10.0,10.0
+Np-233,100.0,100.0
+Np-234,10.0,10.0
+Np-235,100.0,100.0
+Np-236,1.0,1.0
+Np-236m,1000.0,1000.0
+Np-237+,1.0,1.0
+Np-238,100.0,100.0
+Np-239,100.0,100.0
+Np-240,10.0,10.0
+Pu-234,100.0,100.0
+Pu-235,100.0,100.0
+Pu-236,1.0,10.0
+Pu-237,100.0,1000.0
+Pu-238,0.1,1.0
+Pu-239+,0.1,1.0
+Pu-240,0.1,1.0
+Pu-241+,10.0,100.0
+Pu-242,0.1,1.0
+Pu-243,1000.0,1000.0
+Pu-244+,0.1,1.0
+Pu-245+,100.0,100.0
+Pu-246+,100.0,100.0
+Am-237+,100.0,100.0
+Am-238,10.0,10.0
+Am-239,100.0,100.0
+Am-240,10.0,10.0
+Am-241,0.1,1.0
+Am-242,1000.0,1000.0
+Am-242m+,0.1,1.0
+Am-243+,0.1,1.0
+Am-244,10.0,10.0
+Am-244m,10000.0,10000.0
+Am-245,1000.0,1000.0
+Am-246,10.0,10.0
+Am-246m,10.0,10.0
+Cm-238+,100.0,100.0
+Cm-240,100.0,100.0
+Cm-241,10.0,10.0
+Cm-242,10.0,100.0
+Cm-243,1.0,1.0
+Cm-244,1.0,10.0
+Cm-245,0.1,1.0
+Cm-246,0.1,1.0
+Cm-247+,0.1,1.0
+Cm-248,0.1,1.0
+Cm-249,1000.0,1000.0
+Cm-250+,0.01,0.01
+Bk-245,100.0,100.0
+Bk-246+,10.0,10.0
+Bk-247,0.1,0.1
+Bk-249+,100.0,1000.0
+Bk-250,10.0,10.0
+Cf-244,10000.0,10000.0
+Cf-246,1000.0,1000.0
+Cf-248,1.0,10.0
+Cf-249,0.1,1.0
+Cf-250,1.0,10.0
+Cf-251,0.1,1.0
+Cf-252,1.0,10.0
+Cf-253+,100.0,100.0
+Cf-254,1.0,1.0
+Es-250,100.0,100.0
+Es-251,100.0,100.0
+Es-253,100.0,100.0
+Es-254+,0.1,10.0
+Es-254m+,10.0,10.0
+Fm-252,1000.0,1000.0
+Fm-253,100.0,100.0
+Fm-254,10000.0,10000.0
+Fm-255,100.0,100.0
+Fm-257,1.0,1.0
+Md-257,100.0,100.0
+Md-258+,10.0,10.0
 `
 };
 // --- js/utils/Constants.js ---
@@ -1981,35 +2581,129 @@ const SECONDS_PER_DAY = 86400;
 // --- js/utils/PeriodicTable.js ---
 /**
  * PeriodicTable.js
- * List of elements for autocomplete functionality.
- * Sorted Alphabetically for better UX.
+ * Enriched list of elements for autocomplete and visualization.
+ * Contains atomic number (Z), symbol, name, and category.
  */
 
 const PERIODIC_TABLE = [
-    "Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au",
-    "B", "Ba", "Be", "Bh", "Bi", "Bk", "Br",
-    "C", "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu",
-    "Db", "Ds", "Dy",
-    "Er", "Es", "Eu",
-    "F", "Fe", "Fl", "Fm", "Fr",
-    "Ga", "Gd", "Ge",
-    "H", "He", "Hf", "Hg", "Ho", "Hs",
-    "I", "In", "Ir",
-    "K", "Kr",
-    "La", "Li", "Lr", "Lu", "Lv",
-    "Mc", "Md", "Mg", "Mn", "Mo", "Mt",
-    "N", "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np",
-    "O", "Og", "Os",
-    "P", "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
-    "Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru",
-    "S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
-    "Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts",
-    "U",
-    "V",
-    "W",
-    "Xe",
-    "Y", "Yb",
-    "Zn", "Zr"
+    { Z: 1, symbol: "H", name: "Hydrogen", group: 1, period: 1, category: "diatomic nonmetal" },
+    { Z: 2, symbol: "He", name: "Helium", group: 18, period: 1, category: "noble gas" },
+    { Z: 3, symbol: "Li", name: "Lithium", group: 1, period: 2, category: "alkali metal" },
+    { Z: 4, symbol: "Be", name: "Beryllium", group: 2, period: 2, category: "alkaline earth metal" },
+    { Z: 5, symbol: "B", name: "Boron", group: 13, period: 2, category: "metalloid" },
+    { Z: 6, symbol: "C", name: "Carbon", group: 14, period: 2, category: "polyatomic nonmetal" },
+    { Z: 7, symbol: "N", name: "Nitrogen", group: 15, period: 2, category: "diatomic nonmetal" },
+    { Z: 8, symbol: "O", name: "Oxygen", group: 16, period: 2, category: "diatomic nonmetal" },
+    { Z: 9, symbol: "F", name: "Fluorine", group: 17, period: 2, category: "diatomic nonmetal" },
+    { Z: 10, symbol: "Ne", name: "Neon", group: 18, period: 2, category: "noble gas" },
+    { Z: 11, symbol: "Na", name: "Sodium", group: 1, period: 3, category: "alkali metal" },
+    { Z: 12, symbol: "Mg", name: "Magnesium", group: 2, period: 3, category: "alkaline earth metal" },
+    { Z: 13, symbol: "Al", name: "Aluminium", group: 13, period: 3, category: "post-transition metal" },
+    { Z: 14, symbol: "Si", name: "Silicon", group: 14, period: 3, category: "metalloid" },
+    { Z: 15, symbol: "P", name: "Phosphorus", group: 15, period: 3, category: "polyatomic nonmetal" },
+    { Z: 16, symbol: "S", name: "Sulfur", group: 16, period: 3, category: "polyatomic nonmetal" },
+    { Z: 17, symbol: "Cl", name: "Chlorine", group: 17, period: 3, category: "diatomic nonmetal" },
+    { Z: 18, symbol: "Ar", name: "Argon", group: 18, period: 3, category: "noble gas" },
+    { Z: 19, symbol: "K", name: "Potassium", group: 1, period: 4, category: "alkali metal" },
+    { Z: 20, symbol: "Ca", name: "Calcium", group: 2, period: 4, category: "alkaline earth metal" },
+    { Z: 21, symbol: "Sc", name: "Scandium", group: 3, period: 4, category: "transition metal" },
+    { Z: 22, symbol: "Ti", name: "Titanium", group: 4, period: 4, category: "transition metal" },
+    { Z: 23, symbol: "V", name: "Vanadium", group: 5, period: 4, category: "transition metal" },
+    { Z: 24, symbol: "Cr", name: "Chromium", group: 6, period: 4, category: "transition metal" },
+    { Z: 25, symbol: "Mn", name: "Manganese", group: 7, period: 4, category: "transition metal" },
+    { Z: 26, symbol: "Fe", name: "Iron", group: 8, period: 4, category: "transition metal" },
+    { Z: 27, symbol: "Co", name: "Cobalt", group: 9, period: 4, category: "transition metal" },
+    { Z: 28, symbol: "Ni", name: "Nickel", group: 10, period: 4, category: "transition metal" },
+    { Z: 29, symbol: "Cu", name: "Copper", group: 11, period: 4, category: "transition metal" },
+    { Z: 30, symbol: "Zn", name: "Zinc", group: 12, period: 4, category: "transition metal" },
+    { Z: 31, symbol: "Ga", name: "Gallium", group: 13, period: 4, category: "post-transition metal" },
+    { Z: 32, symbol: "Ge", name: "Germanium", group: 14, period: 4, category: "metalloid" },
+    { Z: 33, symbol: "As", name: "Arsenic", group: 15, period: 4, category: "metalloid" },
+    { Z: 34, symbol: "Se", name: "Selenium", group: 16, period: 4, category: "polyatomic nonmetal" },
+    { Z: 35, symbol: "Br", name: "Bromine", group: 17, period: 4, category: "diatomic nonmetal" },
+    { Z: 36, symbol: "Kr", name: "Krypton", group: 18, period: 4, category: "noble gas" },
+    { Z: 37, symbol: "Rb", name: "Rubidium", group: 1, period: 5, category: "alkali metal" },
+    { Z: 38, symbol: "Sr", name: "Strontium", group: 2, period: 5, category: "alkaline earth metal" },
+    { Z: 39, symbol: "Y", name: "Yttrium", group: 3, period: 5, category: "transition metal" },
+    { Z: 40, symbol: "Zr", name: "Zirconium", group: 4, period: 5, category: "transition metal" },
+    { Z: 41, symbol: "Nb", name: "Niobium", group: 5, period: 5, category: "transition metal" },
+    { Z: 42, symbol: "Mo", name: "Molybdenum", group: 6, period: 5, category: "transition metal" },
+    { Z: 43, symbol: "Tc", name: "Technetium", group: 7, period: 5, category: "transition metal" },
+    { Z: 44, symbol: "Ru", name: "Ruthenium", group: 8, period: 5, category: "transition metal" },
+    { Z: 45, symbol: "Rh", name: "Rhodium", group: 9, period: 5, category: "transition metal" },
+    { Z: 46, symbol: "Pd", name: "Palladium", group: 10, period: 5, category: "transition metal" },
+    { Z: 47, symbol: "Ag", name: "Silver", group: 11, period: 5, category: "transition metal" },
+    { Z: 48, symbol: "Cd", name: "Cadmium", group: 12, period: 5, category: "transition metal" },
+    { Z: 49, symbol: "In", name: "Indium", group: 13, period: 5, category: "post-transition metal" },
+    { Z: 50, symbol: "Sn", name: "Tin", group: 14, period: 5, category: "post-transition metal" },
+    { Z: 51, symbol: "Sb", name: "Antimony", group: 15, period: 5, category: "metalloid" },
+    { Z: 52, symbol: "Te", name: "Tellurium", group: 16, period: 5, category: "metalloid" },
+    { Z: 53, symbol: "I", name: "Iodine", group: 17, period: 5, category: "diatomic nonmetal" },
+    { Z: 54, symbol: "Xe", name: "Xenon", group: 18, period: 5, category: "noble gas" },
+    { Z: 55, symbol: "Cs", name: "Cesium", group: 1, period: 6, category: "alkali metal" },
+    { Z: 56, symbol: "Ba", name: "Barium", group: 2, period: 6, category: "alkaline earth metal" },
+    { Z: 57, symbol: "La", name: "Lanthanum", group: 3, period: 6, category: "lanthanide" },
+    { Z: 58, symbol: "Ce", name: "Cerium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 59, symbol: "Pr", name: "Praseodymium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 60, symbol: "Nd", name: "Neodymium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 61, symbol: "Pm", name: "Promethium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 62, symbol: "Sm", name: "Samarium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 63, symbol: "Eu", name: "Europium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 64, symbol: "Gd", name: "Gadolinium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 65, symbol: "Tb", name: "Terbium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 66, symbol: "Dy", name: "Dysprosium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 67, symbol: "Ho", name: "Holmium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 68, symbol: "Er", name: "Erbium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 69, symbol: "Tm", name: "Thulium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 70, symbol: "Yb", name: "Ytterbium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 71, symbol: "Lu", name: "Lutetium", group: 3, period: 6, category: "lanthanide" },
+    { Z: 72, symbol: "Hf", name: "Hafnium", group: 4, period: 6, category: "transition metal" },
+    { Z: 73, symbol: "Ta", name: "Tantalum", group: 5, period: 6, category: "transition metal" },
+    { Z: 74, symbol: "W", name: "Tungsten", group: 6, period: 6, category: "transition metal" },
+    { Z: 75, symbol: "Re", name: "Rhenium", group: 7, period: 6, category: "transition metal" },
+    { Z: 76, symbol: "Os", name: "Osmium", group: 8, period: 6, category: "transition metal" },
+    { Z: 77, symbol: "Ir", name: "Iridium", group: 9, period: 6, category: "transition metal" },
+    { Z: 78, symbol: "Pt", name: "Platinum", group: 10, period: 6, category: "transition metal" },
+    { Z: 79, symbol: "Au", name: "Gold", group: 11, period: 6, category: "transition metal" },
+    { Z: 80, symbol: "Hg", name: "Mercury", group: 12, period: 6, category: "transition metal" },
+    { Z: 81, symbol: "Tl", name: "Thallium", group: 13, period: 6, category: "post-transition metal" },
+    { Z: 82, symbol: "Pb", name: "Lead", group: 14, period: 6, category: "post-transition metal" },
+    { Z: 83, symbol: "Bi", name: "Bismuth", group: 15, period: 6, category: "post-transition metal" },
+    { Z: 84, symbol: "Po", name: "Polonium", group: 16, period: 6, category: "post-transition metal" },
+    { Z: 85, symbol: "At", name: "Astatine", group: 17, period: 6, category: "metalloid" },
+    { Z: 86, symbol: "Rn", name: "Radon", group: 18, period: 6, category: "noble gas" },
+    { Z: 87, symbol: "Fr", name: "Francium", group: 1, period: 7, category: "alkali metal" },
+    { Z: 88, symbol: "Ra", name: "Radium", group: 2, period: 7, category: "alkaline earth metal" },
+    { Z: 89, symbol: "Ac", name: "Actinium", group: 3, period: 7, category: "actinide" },
+    { Z: 90, symbol: "Th", name: "Thorium", group: 3, period: 7, category: "actinide" },
+    { Z: 91, symbol: "Pa", name: "Protactinium", group: 3, period: 7, category: "actinide" },
+    { Z: 92, symbol: "U", name: "Uranium", group: 3, period: 7, category: "actinide" },
+    { Z: 93, symbol: "Np", name: "Neptunium", group: 3, period: 7, category: "actinide" },
+    { Z: 94, symbol: "Pu", name: "Plutonium", group: 3, period: 7, category: "actinide" },
+    { Z: 95, symbol: "Am", name: "Americium", group: 3, period: 7, category: "actinide" },
+    { Z: 96, symbol: "Cm", name: "Curium", group: 3, period: 7, category: "actinide" },
+    { Z: 97, symbol: "Bk", name: "Berkelium", group: 3, period: 7, category: "actinide" },
+    { Z: 98, symbol: "Cf", name: "Californium", group: 3, period: 7, category: "actinide" },
+    { Z: 99, symbol: "Es", name: "Einsteinium", group: 3, period: 7, category: "actinide" },
+    { Z: 100, symbol: "Fm", name: "Fermium", group: 3, period: 7, category: "actinide" },
+    { Z: 101, symbol: "Md", name: "Mendelevium", group: 3, period: 7, category: "actinide" },
+    { Z: 102, symbol: "No", name: "Nobelium", group: 3, period: 7, category: "actinide" },
+    { Z: 103, symbol: "Lr", name: "Lawrencium", group: 3, period: 7, category: "actinide" },
+    { Z: 104, symbol: "Rf", name: "Rutherfordium", group: 4, period: 7, category: "transition metal" },
+    { Z: 105, symbol: "Db", name: "Dubnium", group: 5, period: 7, category: "transition metal" },
+    { Z: 106, symbol: "Sg", name: "Seaborgium", group: 6, period: 7, category: "transition metal" },
+    { Z: 107, symbol: "Bh", name: "Bohrium", group: 7, period: 7, category: "transition metal" },
+    { Z: 108, symbol: "Hs", name: "Hassium", group: 8, period: 7, category: "transition metal" },
+    { Z: 109, symbol: "Mt", name: "Meitnerium", group: 9, period: 7, category: "chemical element" },
+    { Z: 110, symbol: "Ds", name: "Darmstadtium", group: 10, period: 7, category: "chemical element" },
+    { Z: 111, symbol: "Rg", name: "Roentgenium", group: 11, period: 7, category: "chemical element" },
+    { Z: 112, symbol: "Cn", name: "Copernicium", group: 12, period: 7, category: "transition metal" },
+    { Z: 113, symbol: "Nh", name: "Nihonium", group: 13, period: 7, category: "chemical element" },
+    { Z: 114, symbol: "Fl", name: "Flerovium", group: 14, period: 7, category: "post-transition metal" },
+    { Z: 115, symbol: "Mc", name: "Moscovium", group: 15, period: 7, category: "chemical element" },
+    { Z: 116, symbol: "Lv", name: "Livermorium", group: 16, period: 7, category: "chemical element" },
+    { Z: 117, symbol: "Ts", name: "Tennessine", group: 17, period: 7, category: "chemical element" },
+    { Z: 118, symbol: "Og", name: "Oganesson", group: 18, period: 7, category: "noble gas" }
 ];
 
 // --- js/utils/Parser.js ---
@@ -2185,6 +2879,407 @@ class Presets {
     }
 }
 
+// --- js/store/UserRoles.js ---
+/**
+ * UserRoles.js
+ * Role-based access control for the NAA Web Calculator.
+ * Manages user permissions based on login role (basic vs admin).
+ */
+
+const SESSION_ROLE_KEY = 'naa_user_role';
+
+// Fields that are always editable by any user (isotope selection inputs)
+const ALWAYS_EDITABLE = [
+    'input-iso',      // Single isotope input
+    'imp-sym',        // Impurity element symbol input
+    'waste-imp-sym',  // Waste impurity symbol input
+    'lim-sym'         // Limit element symbol input
+];
+
+// Fields that require admin access
+const ADMIN_ONLY_FIELDS = [
+    // Single Isotope Tab
+    'input-mass',
+    'input-flux',
+    'input-time',
+    'input-cool',
+
+    // Impurity Tab
+    'imp-ppm',
+    'imp-mass',
+    'imp-flux',
+    'imp-time',
+    'imp-cool',
+
+    // Waste Tab
+    'waste-imp-ppm',
+    'waste-mass',
+    'waste-total',
+    'waste-flux',
+    'waste-time',
+    'waste-cool',
+
+    // Limit Tab
+    'lim-frac',
+    'lim-waste',
+    'lim-mass',
+    'lim-wmass',
+    'lim-flux',
+    'lim-time',
+    'lim-cool',
+    'lim-type'
+];
+
+// Buttons that require admin access
+const ADMIN_ONLY_BUTTONS = [
+    'btn-add-imp',
+    'btn-add-waste-imp',
+    'btn-add-lim'
+];
+
+// Button classes that require admin access
+const ADMIN_ONLY_BUTTON_CLASSES = [
+    'btn-save-preset',
+    'btn-load-preset',
+    'btn-remove-item'
+];
+
+class UserRoles {
+    /**
+     * Get the current user role from session storage.
+     * @returns {'admin' | 'basic' | null} The user role or null if not logged in.
+     */
+    static getCurrentRole() {
+        try {
+            return sessionStorage.getItem(SESSION_ROLE_KEY);
+        } catch (e) {
+            console.warn('UserRoles: Cannot access sessionStorage');
+            return null;
+        }
+    }
+
+    /**
+     * Set the user role in session storage.
+     * @param {'admin' | 'basic'} role The role to set.
+     */
+    static setRole(role) {
+        try {
+            sessionStorage.setItem(SESSION_ROLE_KEY, role);
+        } catch (e) {
+            console.warn('UserRoles: Cannot write to sessionStorage');
+        }
+    }
+
+    /**
+     * Check if current user is admin.
+     * @returns {boolean}
+     */
+    static isAdmin() {
+        return this.getCurrentRole() === 'admin';
+    }
+
+    /**
+     * Check if current user is basic.
+     * @returns {boolean}
+     */
+    static isBasic() {
+        return this.getCurrentRole() === 'basic';
+    }
+
+    /**
+     * Check if the user can edit a specific field.
+     * @param {string} fieldId The ID of the field to check.
+     * @returns {boolean}
+     */
+    static canEditField(fieldId) {
+        // Admin can edit everything
+        if (this.isAdmin()) return true;
+
+        // Always editable fields (isotope inputs)
+        if (ALWAYS_EDITABLE.includes(fieldId)) return true;
+
+        // If basic user and field is admin-only, deny
+        if (ADMIN_ONLY_FIELDS.includes(fieldId)) return false;
+
+        // Default to allowing for any unknown fields
+        return true;
+    }
+
+    /**
+     * Check if user can use a specific button.
+     * @param {string} buttonId The ID of the button.
+     * @param {string[]} buttonClasses The class list of the button.
+     * @returns {boolean}
+     */
+    static canUseButton(buttonId, buttonClasses = []) {
+        // Admin can use everything
+        if (this.isAdmin()) return true;
+
+        // Check by ID
+        if (ADMIN_ONLY_BUTTONS.includes(buttonId)) return false;
+
+        // Check by class
+        for (const cls of buttonClasses) {
+            if (ADMIN_ONLY_BUTTON_CLASSES.includes(cls)) return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Apply restrictions to all form fields based on current role.
+     * This should be called after forms are rendered.
+     */
+    static applyRestrictions() {
+        const role = this.getCurrentRole();
+        console.log(`UserRoles: Applying restrictions for role "${role}"`);
+
+        if (role === 'admin') {
+            // Admin: Remove all restrictions
+            this._enableAllFields();
+            return;
+        }
+
+        // Basic user: Apply restrictions
+        this._applyBasicRestrictions();
+    }
+
+    /**
+     * Enable all fields (for admin users).
+     */
+    static _enableAllFields() {
+        document.querySelectorAll('.input-restricted').forEach(el => {
+            el.classList.remove('input-restricted');
+            el.disabled = false;
+        });
+        document.querySelectorAll('.btn-restricted').forEach(el => {
+            el.classList.remove('btn-restricted');
+            el.disabled = false;
+            el.style.display = '';
+        });
+    }
+
+    /**
+     * Apply restrictions for basic users.
+     */
+    static _applyBasicRestrictions() {
+        // Restrict admin-only input fields
+        ADMIN_ONLY_FIELDS.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.disabled = true;
+                field.classList.add('input-restricted');
+            }
+        });
+
+        // Restrict admin-only buttons by ID
+        ADMIN_ONLY_BUTTONS.forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('btn-restricted');
+            }
+        });
+
+        // Restrict admin-only buttons by class
+        ADMIN_ONLY_BUTTON_CLASSES.forEach(cls => {
+            document.querySelectorAll(`.${cls}`).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('btn-restricted');
+            });
+        });
+    }
+
+    /**
+     * Get a display-friendly role name.
+     * @returns {string}
+     */
+    static getRoleDisplayName() {
+        const role = this.getCurrentRole();
+        if (role === 'admin') return 'Administrator';
+        if (role === 'basic') return 'Viewer';
+        return 'Unknown';
+    }
+}
+
+// --- js/store/History.js ---
+/**
+ * History.js
+ * Manages calculation history using localStorage in Premium App.
+ * Handles persistence of calculation history and sessions.
+ */
+
+class HistoryManager {
+    constructor() {
+        this.STORAGE_KEY_HISTORY = 'nuclear_calc_history';
+        this.STORAGE_KEY_SESSIONS = 'nuclear_calc_sessions';
+        this.history = [];
+        this.sessions = [];
+        this.init();
+    }
+
+    init() {
+        this.loadFromStorage();
+        console.log(`HistoryManager initialized: ${this.history.length} items, ${this.sessions.length} sessions`);
+    }
+
+    loadFromStorage() {
+        try {
+            const hist = localStorage.getItem(this.STORAGE_KEY_HISTORY);
+            const sess = localStorage.getItem(this.STORAGE_KEY_SESSIONS);
+
+            this.history = hist ? JSON.parse(hist) : [];
+            this.sessions = sess ? JSON.parse(sess) : [];
+        } catch (e) {
+            console.error('Failed to load history from LocalStorage', e);
+            this.history = [];
+            this.sessions = [];
+        }
+    }
+
+    saveToStorage() {
+        try {
+            localStorage.setItem(this.STORAGE_KEY_HISTORY, JSON.stringify(this.history));
+            localStorage.setItem(this.STORAGE_KEY_SESSIONS, JSON.stringify(this.sessions));
+        } catch (e) {
+            console.error('Failed to save history to LocalStorage', e);
+            if (e.name === 'QuotaExceededError') {
+                console.warn('LocalStorage quota exceeded');
+            }
+        }
+    }
+
+    /**
+     * Save a calculation result
+     * @param {string} type - 'single', 'impurity', 'waste', 'limit'
+     * @param {Object} params - Input parameters
+     * @param {string} summary - Human readable summary string
+     */
+    saveCalculation(type, params, summary) {
+        const item = {
+            id: this._generateId(),
+            timestamp: new Date().toISOString(),
+            type: type,
+            params: params,
+            summary: summary
+        };
+
+        this.history.unshift(item);
+
+        if (this.history.length > 100) {
+            this.history = this.history.slice(0, 100);
+        }
+
+        this.saveToStorage();
+        return item;
+    }
+
+    getHistory() {
+        return this.history;
+    }
+
+    deleteHistoryItem(id) {
+        this.history = this.history.filter(item => item.id !== id);
+        this.saveToStorage();
+    }
+
+    clearHistory() {
+        this.history = [];
+        this.saveToStorage();
+    }
+
+    // =========================================================================
+    // Session Management
+    // =========================================================================
+
+    createSession(name, itemIds) {
+        const selectedItems = this.history.filter(item => itemIds.includes(item.id));
+        if (selectedItems.length === 0) return null;
+
+        const session = {
+            id: this._generateId(),
+            name: name,
+            created: new Date().toISOString(),
+            items: JSON.parse(JSON.stringify(selectedItems))
+        };
+
+        this.sessions.unshift(session);
+        this.saveToStorage();
+        return session;
+    }
+
+    getSessions() {
+        return this.sessions;
+    }
+
+    deleteSession(id) {
+        this.sessions = this.sessions.filter(s => s.id !== id);
+        this.saveToStorage();
+    }
+
+    // =========================================================================
+    // Import / Export
+    // =========================================================================
+
+    exportSession(sessionId) {
+        const session = this.sessions.find(s => s.id === sessionId);
+        if (!session) return null;
+        return JSON.stringify(session, null, 2);
+    }
+
+    importSession(jsonString) {
+        try {
+            const session = JSON.parse(jsonString);
+            if (!session.name || !session.items) throw new Error('Invalid session format');
+
+            session.id = this._generateId();
+            session.created = new Date().toISOString();
+            session.name = session.name + ' (Imported)';
+
+            this.sessions.unshift(session);
+            this.saveToStorage();
+            return session;
+        } catch (e) {
+            console.error('Import failed', e);
+            throw e;
+        }
+    }
+
+    _generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // =========================================================================
+    // Static Helpers for Autocomplete (Recent Searches)
+    // =========================================================================
+
+    static _instance = null;
+    static getInstance() {
+        if (!this._instance) this._instance = new HistoryManager();
+        return this._instance;
+    }
+
+    static RECENT_SEARCH_KEY = 'nuclear_recent_searches';
+
+    static getRecentSearches() {
+        try {
+            const raw = localStorage.getItem(this.RECENT_SEARCH_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+    }
+
+    static addRecentSearch(term) {
+        if (!term || !term.trim()) return;
+        let recents = this.getRecentSearches();
+        // Remove if exists to move to top
+        recents = recents.filter(r => r !== term);
+        recents.unshift(term);
+        // Limit to 10
+        if (recents.length > 10) recents = recents.slice(0, 10);
+        localStorage.setItem(this.RECENT_SEARCH_KEY, JSON.stringify(recents));
+    }
+}
+
 // --- js/store/Store.js ---
 /**
  * Store.js
@@ -2354,6 +3449,510 @@ class DataLoader {
                 return obj;
             }, {});
         });
+    }
+}
+
+// --- js/utils/SearchModule.js ---
+/**
+ * SearchModule.js
+ * Centralized logic for element and isotope searching using fuzzy matching.
+ */
+
+
+
+class SearchModule {
+    constructor() {
+        // Core Elements
+        this.elements = PERIODIC_TABLE.map(e => ({
+            ...e,
+            lowerSym: e.symbol.toLowerCase(),
+            lowerName: e.name.toLowerCase()
+        }));
+
+        // Valid Isotopes (injected later from XS Data)
+        // Format: { label: "Lu-176 (2.59%)", value: "Lu-176", element: "Lu", lower: "lu-176" }
+        this.isotopes = [];
+        this.isotopeMap = new Map(); // "Lu" -> ["Lu-176", "Lu-177", ...]
+    }
+
+    /**
+     * Load valid isotopes from the nuclear database (xsData)
+     * @param {Array} isotopeList List of { symbol, A, abundance }
+     */
+    loadIsotopes(isotopeList) {
+        this.isotopes = [];
+        this.isotopeMap.clear();
+
+        isotopeList.forEach(iso => {
+            const sym = iso.symbol;
+            const A = iso.A;
+            const full = `${sym}-${A}`;
+            const label = full;
+
+            const item = {
+                label: label,
+                value: full,
+                element: sym,
+                lower: full.toLowerCase(),
+                type: 'isotope'
+            };
+
+            this.isotopes.push(item);
+
+            if (!this.isotopeMap.has(sym)) this.isotopeMap.set(sym, []);
+            this.isotopeMap.get(sym).push(item);
+        });
+
+        console.log(`SearchModule: Loaded ${this.isotopes.length} isotopes.`);
+    }
+
+    /**
+     * Search for isotopes/elements
+     * @param {string} query 
+     * @returns {Array} List of suggestions { label, value, type, score }
+     */
+    search(query) {
+        if (!query || query.length < 1) return [];
+        const q = query.toLowerCase().trim();
+
+        // Check if query contains digits (strict isotope search)
+        const hasDigits = /\d/.test(q);
+        const matches = [];
+
+        // 1. Element Search
+        if (!hasDigits) {
+            this.elements.forEach(e => {
+                let score = 0;
+                // Match Symbol
+                if (e.lowerSym === q) score = 100; // Exact Symbol
+                else if (e.lowerSym.startsWith(q)) score = 80; // Prefix Symbol
+
+                // Match Name
+                else if (e.lowerName === q) score = 90; // Exact Name
+                else if (e.lowerName.startsWith(q)) score = 60; // Prefix Name
+                else if (e.lowerName.includes(q)) score = 10; // Contains Name
+
+                if (score > 0) {
+                    // Add Element itself
+                    matches.push({
+                        label: `${e.name} (${e.symbol})`,
+                        value: e.symbol,
+                        type: 'element',
+                        category: e.category,
+                        score: score
+                    });
+
+                    // Add known isotopes for this element (if exact or strong prefix match)
+                    if (score >= 80 && this.isotopeMap.has(e.symbol)) {
+                        const isos = this.isotopeMap.get(e.symbol);
+                        isos.forEach(iso => {
+                            matches.push({
+                                ...iso,
+                                score: score - 5 // Slightly lower than element itself
+                            });
+                        });
+                    }
+                }
+            });
+        }
+        // 2. Isotope Search (e.g. "Lu-177" or "177")
+        else {
+            // Check direct isotope list matches
+            this.isotopes.forEach(iso => {
+                if (iso.lower.includes(q)) {
+                    matches.push({
+                        ...iso,
+                        score: iso.lower.startsWith(q) ? 100 : 50
+                    });
+                }
+            });
+
+            // Also check mass number only (e.g. "177" -> Lu-177, Yb-177...)
+            const numMatch = q.match(/^\d+$/);
+            if (numMatch) {
+                // Already handled by includes check above (since "lu-177" includes "177")
+                // unique scoring logic?
+            }
+        }
+
+        // Deduplicate by value
+        const unique = new Map();
+        matches.forEach(m => {
+            if (!unique.has(m.value) || unique.get(m.value).score < m.score) {
+                unique.set(m.value, m);
+            }
+        });
+
+        return Array.from(unique.values()).sort((a, b) => b.score - a.score).slice(0, 12);
+    }
+
+    /**
+     * strict validation of isotope input
+     * @param {string} value 
+     * @returns {boolean}
+     */
+    isValidIsotope(value) {
+        if (!value) return false;
+        const lower = value.toLowerCase().trim();
+        return this.isotopes.some(iso => iso.lower === lower);
+    }
+}
+
+const searchModule = new SearchModule();
+
+// --- js/components/PeriodicTableModal.js ---
+/**
+ * PeriodicTableModal.js
+ * Renders an interactive Periodic Table in a modal.
+ */
+
+
+
+class PeriodicTableModal {
+    constructor(onSelect) {
+        this.onSelect = onSelect;
+        this.modal = null;
+        this.init();
+    }
+
+    init() {
+        // Create Modal Structure
+        this.modal = document.createElement('div');
+        this.modal.className = 'manual-overlay'; // Reuse existing modal overlay class
+        this.modal.id = 'period-table-modal';
+
+        const card = document.createElement('div');
+        card.className = 'manual-card pt-card'; // Add specific class
+        card.style.maxWidth = '1100px';
+        card.style.width = '95%';
+
+        card.innerHTML = `
+            <button class="btn-close-manual" id="pt-close">×</button>
+            <h2 style="margin-bottom: 1rem;">Select Element</h2>
+            <div class="pt-grid" id="pt-grid"></div>
+            <div class="pt-legend">
+                <span class="pt-legend-item alkali-metal">Alkali Metal</span>
+                <span class="pt-legend-item alkaline-earth">Alkaline Earth</span>
+                <span class="pt-legend-item transition-metal">Transition Metal</span>
+                <span class="pt-legend-item post-transition">Post-Transition</span>
+                <span class="pt-legend-item metalloid">Metalloid</span>
+                <span class="pt-legend-item nonmetal">Nonmetal</span>
+                <span class="pt-legend-item noble-gas">Noble Gas</span>
+                <span class="pt-legend-item lanthanide">Lanthanide</span>
+                <span class="pt-legend-item actinide">Actinide</span>
+            </div>
+        `;
+
+        this.modal.appendChild(card);
+        document.body.appendChild(this.modal);
+
+        this.renderGrid(card.querySelector('#pt-grid'));
+
+        // Events
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal || e.target.id === 'pt-close') {
+                this.close();
+            }
+        });
+    }
+
+    renderGrid(container) {
+        // 18 Columns, 7 Rows (plus lanthanides/actinides)
+        // We can use grid-column and grid-row styles
+
+        PERIODIC_TABLE.forEach(elem => {
+            const cell = document.createElement('div');
+            cell.className = `pt-cell ${this.getCategoryClass(elem.category)}`;
+            cell.style.gridColumn = elem.group;
+            cell.style.gridRow = elem.period;
+
+            // Handle Lanthanides/Actinides (Group 3, Period 6/7 usually condensed)
+            // We'll create a separate block or use specific positioning
+            if (elem.category === 'lanthanide') {
+                cell.style.gridRow = 9;
+                // Offset group for display row
+                cell.style.gridColumn = (elem.Z - 57) + 3;
+            } else if (elem.category === 'actinide') {
+                cell.style.gridRow = 10;
+                cell.style.gridColumn = (elem.Z - 89) + 3;
+            }
+
+            cell.innerHTML = `
+                <div class="pt-num">${elem.Z}</div>
+                <div class="pt-sym">${elem.symbol}</div>
+                <div class="pt-name">${elem.name}</div>
+            `;
+
+            cell.addEventListener('click', () => {
+                this.onSelect(elem.symbol);
+                this.close();
+            });
+
+            container.appendChild(cell);
+        });
+    }
+
+    getCategoryClass(cat) {
+        if (!cat) return '';
+        // Simplify categories to CSS classes
+        if (cat.includes('alkali') && !cat.includes('earth')) return 'alkali-metal';
+        if (cat.includes('alkaline earth')) return 'alkaline-earth';
+        if (cat.includes('transition')) return 'transition-metal';
+        if (cat.includes('lanthanide')) return 'lanthanide';
+        if (cat.includes('actinide')) return 'actinide';
+        if (cat.includes('noble')) return 'noble-gas';
+        if (cat.includes('metalloid')) return 'metalloid';
+        if (cat.includes('nonmetal')) return 'nonmetal';
+        if (cat.includes('post-transition')) return 'post-transition';
+        return '';
+    }
+
+    open() {
+        this.modal.classList.add('active');
+    }
+
+    close() {
+        this.modal.classList.remove('active');
+    }
+}
+
+// --- js/components/Autocomplete.js ---
+/**
+ * Autocomplete.js
+ * UI Component that attaches to an input field to provide smart search suggestions.
+ */
+
+
+
+
+
+class Autocomplete {
+    /**
+     * @param {string} inputId ID of the input element
+     * @param {Function} onSelect Callback when an item is selected (value) => void
+     * @param {Object} options Configuration options
+     * @param {string} options.filterType Optional 'element' or 'isotope' to strict filter suggestions
+     */
+    constructor(inputId, onSelect, options = {}) {
+        this.input = document.getElementById(inputId);
+        if (!this.input) return;
+
+        this.onSelect = onSelect;
+        this.options = options;
+        this.wrapper = null;
+        this.dropdown = null;
+        this.suggestions = [];
+        this.selectionIndex = -1;
+        this.ptModal = null; // Lazy init
+
+        this.init();
+    }
+
+    init() {
+        // Prevent double init
+        if (this.input.dataset.autocomplete) return;
+        this.input.dataset.autocomplete = "true";
+
+        // Remove native list if present
+        this.input.removeAttribute('list');
+
+        // Wrap input
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'autocomplete-wrapper';
+        this.wrapper.style.position = 'relative';
+        this.input.parentNode.insertBefore(this.wrapper, this.input);
+        this.wrapper.appendChild(this.input);
+
+        // Sidebar/Grid Button
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-open-pt';
+        btn.innerHTML = '📅'; // Grid/Table icon
+        btn.title = 'Open Periodic Table';
+        btn.style.cssText = `
+            position: absolute; 
+            right: 8px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.2rem; 
+            opacity: 0.5; 
+            padding: 4px;
+            z-index: 5;
+            transition: opacity 0.2s;
+        `;
+        btn.addEventListener('mouseenter', () => btn.style.opacity = '1');
+        btn.addEventListener('mouseleave', () => btn.style.opacity = '0.5');
+        btn.addEventListener('click', () => this.openPeriodicTable());
+        this.wrapper.appendChild(btn);
+
+        // Adjust input padding
+        this.input.style.paddingRight = '40px';
+
+        // Create Dropdown
+        this.dropdown = document.createElement('div');
+        this.dropdown.className = 'autocomplete-dropdown';
+        this.dropdown.style.display = 'none';
+        this.wrapper.appendChild(this.dropdown);
+
+        // Events
+        this.input.addEventListener('input', () => this.onInput());
+        this.input.addEventListener('keydown', (e) => this.onKeyDown(e));
+        this.input.addEventListener('focus', () => this.onFocus());
+
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!this.wrapper.contains(e.target)) this.close();
+        });
+    }
+
+    openPeriodicTable() {
+        if (!this.ptModal) {
+            this.ptModal = new PeriodicTableModal((symbol) => {
+                this.selectItem({
+                    label: symbol,
+                    value: symbol,
+                    type: 'element'
+                });
+            });
+        }
+        this.ptModal.open();
+    }
+
+    onInput() {
+        const val = this.input.value.trim();
+        if (val.length < 1) {
+            this.showRecents();
+            return;
+        }
+
+        let results = searchModule.search(val);
+
+        // Filter if requested
+        if (this.options.filterType) {
+            results = results.filter(item => item.type === this.options.filterType);
+        }
+
+        this.suggestions = results;
+        this.render();
+    }
+
+    onFocus() {
+        if (this.input.value.trim().length === 0) {
+            this.showRecents();
+        } else {
+            this.onInput();
+        }
+    }
+
+    showRecents() {
+        const recents = HistoryManager.getRecentSearches();
+        if (!recents || recents.length === 0) {
+            this.close();
+            return;
+        }
+
+        this.suggestions = recents.map(r => ({
+            label: r,
+            value: r,
+            type: 'recent',
+            category: 'Recent'
+        }));
+        this.render();
+    }
+
+    onKeyDown(e) {
+        if (this.dropdown.style.display === 'none') return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.selectionIndex = Math.min(this.selectionIndex + 1, this.suggestions.length - 1);
+            this.refreshHighlight();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.selectionIndex = Math.max(this.selectionIndex - 1, -1);
+            this.refreshHighlight();
+        } else if (e.key === 'Enter') {
+            if (this.selectionIndex >= 0 && this.suggestions[this.selectionIndex]) {
+                e.preventDefault();
+                this.selectItem(this.suggestions[this.selectionIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            this.close();
+        }
+    }
+
+    render() {
+        if (this.suggestions.length === 0) {
+            this.close();
+            return;
+        }
+
+        this.dropdown.innerHTML = '';
+        this.selectionIndex = -1;
+
+        this.suggestions.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item';
+
+            let icon;
+            if (item.type === 'recent') icon = '🕒';
+            else if (item.type === 'element') icon = '⚛️';
+            else icon = '☢️';
+
+            div.innerHTML = `
+                <span class="ac-icon">${icon}</span>
+                <span class="ac-label">${item.label}</span>
+                ${item.category ? `<span class="ac-category">${item.category}</span>` : ''}
+            `;
+
+            div.addEventListener('click', () => this.selectItem(item));
+            div.addEventListener('mouseenter', () => {
+                this.selectionIndex = idx;
+                this.refreshHighlight();
+            });
+
+            this.dropdown.appendChild(div);
+        });
+
+        this.dropdown.style.display = 'block';
+    }
+
+    refreshHighlight() {
+        Array.from(this.dropdown.children).forEach((child, idx) => {
+            child.classList.toggle('selected', idx === this.selectionIndex);
+            if (idx === this.selectionIndex) {
+                child.scrollIntoView({ block: 'nearest' });
+            }
+        });
+    }
+
+    selectItem(item) {
+        if (item.type === 'element') {
+            this.input.value = item.value;
+            // Trigger search to show detailed isotopes for this element
+            this.onInput();
+            return;
+        }
+
+        // Isotope logic (normal)
+        HistoryManager.addRecentSearch(item.value);
+        this.input.value = item.value;
+        this.close();
+
+        // Try to trigger change event so other listeners pick it up
+        this.input.dispatchEvent(new Event('change'));
+        this.input.dispatchEvent(new Event('input'));
+
+        if (this.onSelect) this.onSelect(item.value);
+    }
+
+    close() {
+        this.dropdown.style.display = 'none';
+        this.suggestions = [];
+        this.selectionIndex = -1;
     }
 }
 
@@ -2911,19 +4510,31 @@ function createExportButton(onClick) {
 // --- js/auth/PasswordGate.js ---
 /**
  * PasswordGate.js
- * Simple client-side password protection.
+ * Simple client-side password protection with dual user roles.
+ * - Basic users (itm22View): Can only select isotopes
+ * - Admin users (itm22Fisica): Full access to all parameters
  */
+
+
 class PasswordGate {
     static async init() {
         const SESSION_KEY = 'naa_auth_session';
-        const REQUIRED_PASS = 'itm22Fisica';
+        const ROLE_KEY = 'naa_user_role';
+
+        // Password configuration
+        const PASSWORDS = {
+            'itm22Fisica': 'admin',  // Full access
+            'itm22View': 'basic'     // View/select isotopes only
+        };
 
         console.log('PasswordGate: Starting initialization');
 
+        // Check existing session
         try {
-            if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-                console.log('PasswordGate: Session valid');
-                return true;
+            const existingRole = sessionStorage.getItem(ROLE_KEY);
+            if (existingRole && sessionStorage.getItem(SESSION_KEY) === 'true') {
+                console.log(`PasswordGate: Session valid (role: ${existingRole})`);
+                return { authenticated: true, role: existingRole };
             }
         } catch (e) {
             console.warn('PasswordGate: SessionStorage inaccessible', e);
@@ -2965,10 +4576,21 @@ class PasswordGate {
             const errorMsg = modal.querySelector('#gate-error');
 
             const checkPass = () => {
-                if (input.value === REQUIRED_PASS) {
-                    sessionStorage.setItem(SESSION_KEY, 'true');
+                const enteredPass = input.value;
+                const role = PASSWORDS[enteredPass];
+
+                if (role) {
+                    // Valid password - store session and role
+                    try {
+                        sessionStorage.setItem(SESSION_KEY, 'true');
+                        sessionStorage.setItem(ROLE_KEY, role);
+                        UserRoles.setRole(role);
+                    } catch (e) {
+                        console.warn('PasswordGate: Could not persist session');
+                    }
+
                     modal.remove();
-                    resolve(true);
+                    resolve({ authenticated: true, role: role });
                 } else {
                     errorMsg.textContent = 'Incorrect password';
                     input.value = '';
@@ -3516,6 +5138,7 @@ class NuclearSolver {
                     IsoMaxPPM: isoMaxPPM,
                     Share: share,
                     LimitIso: limitIso,
+                    LimitVal: c.limit,
                     ElemMaxPPM: elemMaxPPM,
                     WastePct: Math.round(f_waste * 100),
                     FracPct: Math.round(f_elem * 100)
@@ -3551,6 +5174,8 @@ class NuclearSolver {
 
 
 
+
+
 class App {
     constructor() {
         this.dataLoader = new DataLoader();
@@ -3560,11 +5185,12 @@ class App {
 
     async init() {
         try {
-            // Security Check
-            const isAuthenticated = await PasswordGate.init();
-            if (!isAuthenticated) return;
+            // Security Check with Role Support
+            const authResult = await PasswordGate.init();
+            if (!authResult || !authResult.authenticated) return;
 
-            console.log('%c Thermal NAA Tool Initializing... ', 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
+            const userRole = authResult.role;
+            console.log(`%c Thermal NAA Tool Initializing (Role: ${userRole}) `, 'background: #0066ff; color: #fff; border-radius: 4px; padding: 2px 8px;');
 
             // Initialize UI
             this.setupNavigation();
@@ -3575,12 +5201,19 @@ class App {
             this.renderLimitForm();
             this.setupEventListeners();
 
+            // Apply role-based restrictions and show role indicator
+            this.applyRoleRestrictions();
+            this.renderRoleIndicator();
+
             this.dataLoader.loadAll()
                 .then(() => {
                     const state = appStore.getState();
                     if (state.dataLoaded) {
                         this.solver = new NuclearSolver(state.xsData, state.chainData, state.limitsData);
-                        console.log('Math Engine Initialized');
+                        // Initialize Search Module with Isotope Data
+                        const isotopeList = this.extractIsotopesFromData(state.xsData);
+                        searchModule.loadIsotopes(isotopeList);
+                        console.log('Math Engine & Search Module Initialized');
                     }
                     console.log('App ready');
                     // Hide any initial loading spinner if applicable
@@ -3605,6 +5238,57 @@ class App {
             <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem; width:100%;">Retry / Refresh</button>
         `;
         document.body.appendChild(modal);
+    }
+
+    /**
+     * Apply role-based restrictions to form inputs.
+     * Basic users can only edit isotope selection inputs.
+     */
+    applyRoleRestrictions() {
+        UserRoles.applyRestrictions();
+        console.log(`UserRoles: Applied restrictions for role "${UserRoles.getCurrentRole()}"`);
+    }
+
+    /**
+     * Add a visual indicator showing the current user role in the header.
+     */
+    renderRoleIndicator() {
+        const role = UserRoles.getCurrentRole();
+        const displayName = UserRoles.getRoleDisplayName();
+
+        // Find header actions area
+        const headerActions = document.querySelector('.header-actions');
+        if (!headerActions) return;
+
+        // Remove existing indicator
+        const existing = document.getElementById('role-indicator');
+        if (existing) existing.remove();
+
+        // Create role badge
+        const badge = document.createElement('div');
+        badge.id = 'role-indicator';
+        badge.className = 'role-indicator';
+        badge.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            ${role === 'admin'
+                ? 'background: linear-gradient(135deg, #00d4ff, #0099cc); color: #000;'
+                : 'background: rgba(255,255,255,0.1); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.2);'}
+        `;
+        badge.innerHTML = `
+            <span style="font-size: 0.9em;">${role === 'admin' ? '👑' : '👁️'}</span>
+            <span>${displayName}</span>
+        `;
+
+        // Insert at beginning of header actions
+        headerActions.insertBefore(badge, headerActions.firstChild);
     }
 
     setupNavigation() {
@@ -4121,9 +5805,22 @@ class App {
                     </div>
                     <div id="waste-imp-list" class="impurity-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
                 </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Limit Standard</label>
+                    <select id="waste-limit-type" class="input-field">
+                        <option value="clearance">Unrestricted Clearance (Column 3 - Anlage)</option>
+                        <option value="exemption">Specific Clearance (Column 9 - Anlage)</option>
+                    </select>
+                </div>
                 <button id="btn-calc-waste" class="btn-primary">Analyze Batch</button>
                 <div id="waste-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
+
+        // Add auto-calc listener
+        setTimeout(() => {
+            const dp = document.getElementById('waste-limit-type');
+            if (dp) dp.addEventListener('change', () => this.handleWasteCalculation());
+        }, 100);
     }
 
     renderLimitForm() {
@@ -4198,14 +5895,20 @@ class App {
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <label>Limit Standard</label>
                     <select id="lim-type" class="input-field">
-                        <option value="clearance">Clearance (Freigabe)</option>
-                        <option value="exemption">Exemption (Befreiung)</option>
+                        <option value="clearance">Unrestricted Clearance (Column 3 - Anlage)</option>
+                        <option value="exemption">Specific Clearance (Column 9 - Anlage)</option>
                     </select>
                 </div>
 
                 <button id="btn-calc-lim" class="btn-primary">Calculate Max ppm</button>
                 <div id="lim-results-area" class="results-area" style="margin-top: 2rem;"></div>
             </div>`;
+
+        // Add auto-calc listener
+        setTimeout(() => {
+            const dp = document.getElementById('lim-type');
+            if (dp) dp.addEventListener('change', () => this.handleLimitCalculation());
+        }, 100);
     }
 
     handleCalculation() {
@@ -4341,12 +6044,9 @@ class App {
         this.showToast('Analyzing Batch...', 'info');
 
         try {
-            // Call Engine
-            // Assuming "H" as dummy main element or null, using 'exemption' for now based on logic2.py logic for incineration/dumping?
-            // "Limit_Incineration_100t_Bq_g" was hinted in logic2.py, but usually we use 'clearance' or 'exemption'.
-            // Let's default to 'exemption' as a safer "waste" limit, but ideally UI should allow selection.
-            // For now, hardcode 'exemption' to match typical waste compliance checks.
-            const limitType = 'exemption';
+            // Get limit type from dropdown
+            const limitTypeSelect = document.getElementById('waste-limit-type');
+            const limitType = limitTypeSelect ? limitTypeSelect.value : 'exemption';
 
             const results = this.solver.calculateWasteCompliance(
                 impurities, null, mass, flux, tIrrS, tCoolS, totalWaste, limitType
@@ -4513,6 +6213,7 @@ class App {
                             <th>Parent Iso</th>
                             <th>Reaction</th>
                             <th>Isotope</th>
+                            <th>Limit (Bq/g)</th>
                             <th>Iso Max ppm</th>
                             <th>Share %</th>
                             <th>Limit Iso</th>
@@ -4533,6 +6234,7 @@ class App {
                         <td>${r.Parent}</td>
                         <td style="font-size: 0.85em; color: var(--text-muted);">${r.Reaction}</td>
                         <td>${r.Isotope}</td>
+                        <td style="font-family: var(--font-mono);">${r.LimitVal.toExponential(2)}</td>
                         <td style="font-family: var(--font-mono);">${isoPpm}</td>
                         <td>${r.Share.toFixed(1)}</td>
                         <td>${r.LimitIso}</td>
@@ -4690,6 +6392,32 @@ class App {
         }, 50);
     }
 
+    extractIsotopesFromData(xsData) {
+        if (!xsData) return [];
+
+        const values = (xsData instanceof Map) ? Array.from(xsData.values()) : xsData;
+        const unique = new Map();
+
+        values.forEach(item => {
+            // Data structure check: simple parser or complex map
+            const sym = item.Symbol || item.Element;
+            const A = item.A || item.Mass_Number;
+            const key = `${sym}-${A}`;
+
+            if (sym && A && !unique.has(key)) {
+                unique.set(key, {
+                    symbol: sym,
+                    A: parseInt(A),
+                    abundance: parseFloat(item.Abundance || 0),
+                    // Keep track if it's a parent (Abundance > 0)
+                    isStable: (parseFloat(item.Abundance || 0) > 0)
+                });
+            }
+        });
+
+        return Array.from(unique.values());
+    }
+
     showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -4698,6 +6426,31 @@ class App {
         toast.textContent = msg;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
+    }
+
+    applyRoleRestrictions() {
+        UserRoles.applyRestrictions();
+    }
+
+    renderRoleIndicator() {
+        const role = UserRoles.getCurrentRole();
+        const header = document.querySelector('.header-actions');
+        if (!header || !role) return;
+
+        // Remove existing indicator if present
+        const existing = header.querySelector('.role-indicator');
+        if (existing) existing.remove();
+
+        const roleLabel = document.createElement('div');
+        roleLabel.className = 'role-indicator';
+        roleLabel.style.cssText = `
+            padding: 4px 12px; border-radius: 4px; font-size: 0.75rem; display: flex; align-items: center;
+            background: ${role === 'admin' ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 200, 0, 0.2)'};
+            color: ${role === 'admin' ? 'var(--accent-cyan)' : '#ffc800'};
+            border: 1px solid ${role === 'admin' ? 'var(--accent-cyan)' : '#ffc800'};
+        `;
+        roleLabel.textContent = UserRoles.getRoleDisplayName();
+        header.insertBefore(roleLabel, header.firstChild);
     }
 }
 

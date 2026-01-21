@@ -35,11 +35,11 @@ class App {
 
             // Initialize UI
             this.setupNavigation();
-            this.setupAutocomplete();
             this.renderSingleIsotopeForm();
             this.renderImpurityForm();
             this.renderWasteForm();
             this.renderLimitForm();
+            this.setupAutocomplete();
             this.setupEventListeners();
 
             // Apply role-based restrictions and show role indicator
